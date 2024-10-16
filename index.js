@@ -27,6 +27,18 @@ app.get("/", (req, res) => {
      });
 });
 
+app.get("/login", (req, res) => {
+    res.render("login", {
+        idCurrentUser: idCurrentUser,
+    });
+});
+
+app.get("/register", (req, res) => {
+    res.render("register", {
+        idCurrentUser: idCurrentUser,
+    });
+});
+
 app.get("/writePost", (req, res) => {
     res.render("writePost");
 });

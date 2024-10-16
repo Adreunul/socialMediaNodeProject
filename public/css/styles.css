@@ -2,7 +2,7 @@ body{
     background-color: rgb(255, 238, 169);
 }
 
-.containerHeader{
+.container-header{
     background-color: rgb(93, 90, 247);
     margin: 0px;
     width: 100% !important;
@@ -20,16 +20,58 @@ body{
     border-radius:5%;
 }
 
-.containerBody{
+.container-body{
     background-color: rgb(255, 238, 169);
     margin-top: 50px;
     height:100vh;
 }
 
-.postsContainer{
+.posts-container{
     display:flex;
     flex-direction: column;
     align-items: center;
+}
+
+.form-container{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.log-in-button-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.register-button-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.go-to-register{
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+.log-in-button{
+    background-color: rgb(255, 102, 0) !important;
+    border: 2px solid black;
+    color: black;
+}
+
+.register-button{
+    background-color: rgb(255, 102, 0) !important;
+    border: 2px solid black;
+    color: black;
+}
+
+.form-floating{
+    margin-bottom: 15px;
 }
 
 .card{

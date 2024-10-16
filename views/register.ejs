@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  </link>
+</head>
+
+<body>
+  <%- include("partials/header.ejs") %>
+  <div class="container-body">
+    <div class="register-form-container form-container">
+        <form action="/" method="GET" id="registerForm">
+            <h1 class="h3 mb-3 fw-normal">Create your Account</h1>
+        
+            <div class="form-floating">
+                <input type="text" class="form-control username-input" id="floatingRegisterUsernameInput" placeholder="username">
+                <label for="floatingRegisterUsernameInput">Username</label>
+              </div>
+            <div class="form-floating">
+              <input type="email" class="form-control email-input" id="floatingRegisterEmailInput" placeholder="name@example.com">
+              <label for="floatingRegisterEmailInput">Email address</label>
+            </div>
+            <div class="form-floating">
+              <input type="password" class="form-control password-input" id="floatingRegisterPassword" placeholder="Password">
+              <label for="floatingRegisterPassword">Password</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control confirm-password-input" id="floatingRegisterConfirmPassword" placeholder="ConfirmPassword">
+                <label for="floatingRegisterConfirmPassword">Confirm Password</label>
+              </div>
+            <div class="register-button-container">
+                <button class="register-button btn btn-primary w-50 py-2" type="submit">Sign Up</button>
+                <a class="go-to-register nav-link active" aria-current="page" href="/login" formaction="get">Already have an Account?</a>
+            </div>
+            <p class="mt-5 mb-3 text-body-secondary">© Another Social Platform 2024</p>
+          </form>
+    </div>
+</body>
+
+</html>
