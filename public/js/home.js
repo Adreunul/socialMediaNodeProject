@@ -1,7 +1,23 @@
 import './header.js';
 
+let currentUserId = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const postsContainer = document.getElementById('posts-container');
+
+    try{
+        const response = await fetch('/api/v1/auth/session');
+        if(response.ok) {
+            const sessionData = await response.json();
+            currentUserId = sessionData.userId;
+        }
+        else {
+            console.error('Failed to fetch session');
+        }
+    } catch(error) {
+        console.error('Failed to fetch session', error);
+    }
+
     try{
         const response = await fetch('/api/v1/posts/getAllPosts');
         if(response.ok) {
@@ -28,6 +44,8 @@ function displayPosts(posts, postsContainer){
         const postCard = document.createElement('div');
         postCard.className = 'card';
         postCard.style.width =  '35rem';
+        console.log("post user ID: "+post.id_author);
+        console.log("current user ID: "+currentUserId);
 
         postCard.innerHTML = `
             <div class="card-body">
@@ -37,8 +55,8 @@ function displayPosts(posts, postsContainer){
                 <hr class="content-underline">
                 <h6 class="author" style="text-align:center">Written by: ${post.username}</h6>
                 <div class="author-buttons">
-                    <a href="#" class="card-link">Edit Post</a>
-                    <a href="#" class="card-link">Delete Post</a>
+                    <a href="#" class="card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Edit Post</a>
+                    <a href="#" class="card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Delete Post</a>
                 </div>
             </div>
         `;
@@ -49,15 +67,8 @@ function displayPosts(posts, postsContainer){
 }
 
 const userActions = document.getElementsByClassName("user-action");
-const logButton = document.getElementById("log-button");
 
 for (let i = 0; i < userActions.length; i++) {
     userActions[i].classList.add("active");
     userActions[i].classList.remove("disabled");
 }
-
-logButton.textContent = "Log Out";
-
-logButton.addEventListener("click", async () => {
-    
-});

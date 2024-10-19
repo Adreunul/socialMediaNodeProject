@@ -14,6 +14,12 @@ const port = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(express.json());
+
+app.use((req, res, next) => { // ca sa nu mai tina minte paginile  care necesitau logare
+    res.set('Cache-Control', 'no-store');
+    next();
+});
+
 app.use(session({
     secret: 'secret',
     resave: false,
@@ -28,7 +34,7 @@ app.get("/", (req, res) => {
    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.get("/home",  (req, res) => {
+app.get("/home", requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
