@@ -31,7 +31,7 @@ export const register = async (username, email, password) => {
         else if(error.detail.includes("username"))
             return "username";
         else
-        return null;
+            return null;
     }
 };
 

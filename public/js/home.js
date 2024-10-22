@@ -44,31 +44,167 @@ function displayPosts(posts, postsContainer){
         const postCard = document.createElement('div');
         postCard.className = 'card';
         postCard.style.width =  '35rem';
+        postCard.style.minWidth = '300px';
         console.log("post user ID: "+post.id_author);
         console.log("current user ID: "+currentUserId);
 
+
         postCard.innerHTML = `
-            <div class="card-body">
-                <h5 class="text card-title" style="text-align: center;">${post.title}</h5>
-                <hr class="title-underline">
-                <p class="text card-text">${post.text}</p>
-                <hr class="content-underline">
-                <h6 class="author" style="text-align:center">Written by: ${post.username}</h6>
-                <div class="author-buttons">
-                    <a href="#" class="card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Edit Post</a>
-                    <a href="#" class="card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Delete Post</a>
+        <div class="card-body">
+            <h5 class="text card-title" style="text-align: center;font-size:1.35rem;">${post.title}</h5>
+            <hr class="title-underline">
+            <p class="text card-text">${post.text}</p>
+            <hr class="content-underline">
+            <h6 class="author" style="text-align:center">Written by: ${post.username}</h6>
+            <div class="author-buttons" style="margin-bottom:10px !important;">
+                <a href="#" class="edit-post card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Edit Post</a>
+                <a href="#" class="delete-post card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Delete Post</a>
+            </div>
+            <div class="post-date" style="display:flex;flex-direction:column;align-items:center;">
+                <div class="post-date-area" style="width:fit-content;height:fit-content;display:flex;flex-direction:column;align-items:center;background-color: rgba(0, 0, 0, 0.075);padding:5px;border:0.75px solid darkgray;border-radius:25%;">
+                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostDate(post)}</p>
+                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostHour(post)}</p>
                 </div>
             </div>
-        `;
+        </div>
+    `;
 
-         postsContainer.appendChild(postCard);
-    });
+        const editButton = postCard.querySelector('.edit-post');
+        const deleteButton = postCard.querySelector('.delete-post');
+
+        // Add click event listeners to the buttons
+        editButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleEditPost(post); // Call the edit post handler with post data
+        });
+
+        deleteButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleDeletePost(post, postCard); // Call the delete post handler with post ID
+        });
+
+        postsContainer.appendChild(postCard);
+    }); 
+}
+
+async function handleDeletePost(post, postCard){
+    var initialCardHeight = postCard.clientHeight;
+    postCard.innerHTML = `
+    <div class="card-body" style="height:${initialCardHeight}px !important; display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <h6 class="confirmation-text" style="text-align:center">Do you want to delete this Post ?</h6>
+        <div class="author-buttons">
+            <a href="#" class="confirm-delete card-link">Delete my Post</a>
+            <a href="#" class="stop-delete card-link">Cancel</a>
+        </div>
+    </div>
+`;
+
+    const confirmButton = postCard.querySelector('.confirm-delete');
+    const cancelButton = postCard.querySelector('.stop-delete');
+
+    confirmButton.addEventListener('click', async (event) => {
+        try{
+            const response = await fetch(`/api/v1/posts/deletePost/${post.id}`, {
+                method: 'DELETE'
+            });
     
+            const data = await response.json();
+    
+            if(response.ok && data.status === 'success'){
+                window.location.reload();
+            }
+            else {
+                alert(data.message);
+                console.error('Failed to delete post mf');
+            }
+        } catch(error){
+            console.error('Failed to delete post 2', error);
+        }
+    });
+
+    cancelButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        postCard.innerHTML = `
+        <div class="card-body">
+            <h5 class="text card-title" style="text-align: center;font-size:1.35rem;">${post.title}</h5>
+            <hr class="title-underline">
+            <p class="text card-text">${post.text}</p>
+            <hr class="content-underline">
+            <h6 class="author" style="text-align:center">Written by: ${post.username}</h6>
+            <div class="author-buttons" style="margin-bottom:10px !important;">
+                <a href="#" class="edit-post card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Edit Post</a>
+                <a href="#" class="delete-post card-link ${post.id_author === currentUserId ? '' : 'invisible'}">Delete Post</a>
+            </div>
+            <div class="post-date" style="display:flex;flex-direction:column;align-items:center;">
+                <div class="post-date-area" style="width:fit-content;height:fit-content;display:flex;flex-direction:column;align-items:center;background-color: rgba(0, 0, 0, 0.075);padding:5px;border:0.75px solid darkgray;border-radius:25%;">
+                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostDate(post)}</p>
+                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostHour(post)}</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+        const editButton = postCard.querySelector('.edit-post');
+        const deleteButton = postCard.querySelector('.delete-post');
+
+        // Add click event listeners to the buttons
+        editButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleEditPost(post); // Call the edit post handler with post data
+        });
+
+        deleteButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleDeletePost(post, postCard); // Call the delete post handler with post ID
+        });
+    });
 }
 
-const userActions = document.getElementsByClassName("user-action");
+function formatPostDate(post) {
+    const postDate = new Date(post.date);
+    const now = new Date();
 
-for (let i = 0; i < userActions.length; i++) {
-    userActions[i].classList.add("active");
-    userActions[i].classList.remove("disabled");
+    // Get the current week's start and end dates
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+
+    // Reset time to 00:00:00 to just compare the date portion
+    startOfWeek.setHours(0, 0, 0, 0);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Check if the postDate is within the current week
+    if (postDate >= startOfWeek && postDate <= endOfWeek) {
+        // If in the current week, display weekday and time (split by <br>)
+        const weekday = postDate.toLocaleDateString('en-US', { weekday: 'long' });
+        return `${weekday}`;
+    } else {
+        // If not in the current week, display full date and time (split by <br>)
+        const date = postDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+        });
+        return date;
+    }
 }
+
+function formatPostHour(post){
+    const postDate = new Date(post.date);
+    const time = postDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // 24-hour format
+    });
+
+    return time;
+}
+
+
+
+
+// const userActions = document.getElementsByClassName("user-action");
+
+// for (let i = 0; i < userActions.length; i++) {
+//     userActions[i].classList.add("active");
+//     userActions[i].classList.remove("disabled");
+// }

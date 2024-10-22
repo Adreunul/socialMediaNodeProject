@@ -1,3 +1,9 @@
+.form-control:focus {
+    border-color: rgb(255, 125, 41) !important; /* Orange border */
+    box-shadow: 0 0 0 0.25rem rgba(255, 125, 41, 0.25); /* Orange focus ring */
+    outline: none;
+}
+
 * {
     font-family: cursive;
     font-size: 1.05rem;
@@ -7,11 +13,19 @@ body{
     background-color: rgb(255, 238, 169);
 }
 
+.card-text{
+    
+}
+
 .container-header{
+    position: fixed;
+    top: 0;
+    z-index: 1000;
     background-color: rgb(93, 90, 247);
     margin: 0px;
     width: 100% !important;
     max-width: none !important;
+    border-bottom: 5px solid rgba(255, 123, 0, 0.753)
 }
 
 .navbar{
@@ -27,7 +41,7 @@ body{
 
 .container-body{
     background-color: rgb(255, 238, 169);
-    margin-top: 50px;
+    margin-top: 100px;
     height:100vh;
 }
 
@@ -59,6 +73,13 @@ body{
     flex-direction: column;
 }
 
+.submit-post-button-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 .go-to-register{
     text-decoration: underline;
     margin-top: 10px;
@@ -81,12 +102,21 @@ body{
     color: black;
 }
 
+.submit-post-button{
+    background-color: rgb(255, 102, 0) !important;
+    border: 2px solid black;
+    margin-top: 10px;
+    color: black;
+    width: 10rem !important;
+}
+
 .form-floating{
     margin-bottom: 15px;
 }
 
 .card{
     width: 33% !important;
+    min-width:400px !important;
     border: 2px solid black;
     margin-bottom: 20px;
 }
@@ -134,3 +164,26 @@ body{
     display:none;
 }
 
+.write-post-form{
+    width: 30%;
+    min-width:300px;
+    min-height:30%;
+}
+
+.new-post-title-input{
+    height:4rem;
+}
+
+.new-post-input{
+    border:2px solid;
+}
+
+.new-post-content-input{
+    min-height:200px !important;
+    max-height:300px;
+
+}
+
+.credentials-input{
+    border:1px solid black;
+}
