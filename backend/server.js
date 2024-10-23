@@ -50,6 +50,10 @@ app.get("/write-post", requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'write-post.html'));
 });
 
+app.get("/edit-post/:id", requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'edit-post.html'));
+});
+
 app.get("/profile", requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });

@@ -11,6 +11,19 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
+export const getPostById = async (req, res) => {
+    const id = req.params.id;
+    console.log("id: "+id);
+
+    try {
+        const post = await Post.getPostById(id);
+        res.status(200).json(post);
+    }   catch (error) {
+        console.error("Error getting post", error);
+        res.status(500).send('Internal server error');
+    }
+};
+
 export const writeNewPost = async (req, res) => {
     const { title, text, id_author } = req.body;
 
@@ -44,6 +57,28 @@ export const writeNewPost = async (req, res) => {
             return res.status(500).json({ status: 'error', message: 'Failed to create post' });
     } catch (error) {
         console.error("Error creating post", error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+export const editPost = async (req, res) => {
+    const { id, text } = req.body;
+
+    if(!text) {
+        return res.status(400).json({ status: 'error', message: 'All fields are required', field: 'all' });
+    }
+
+    if(text.split(" ").length > 100 || text.length > 1200)
+        return res.status(400).json({ status: 'error', message: 'You wrote too much (maximum 100 words)', field: 'text' });
+
+    try {
+        const response = await Post.updatePost(id, text);
+        if(response)
+            return res.status(200).json({ status: 'success', message: 'Post updated' });
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to update post' });
+    } catch (error) {
+        console.error("Error updating post", error);
         res.status(500).send('Internal server error');
     }
 };
@@ -85,9 +120,12 @@ export const deletePost = async (req, res) => {
     return null;
 }
 
+
 export default {
     getAllPosts,
+    getPostById,
     writeNewPost,
+    editPost,
     deletePost,
     
 }

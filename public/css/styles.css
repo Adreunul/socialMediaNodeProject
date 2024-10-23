@@ -110,6 +110,11 @@ body{
     width: 10rem !important;
 }
 
+.cancel-edit-button{
+    margin-top: 15px;
+    font-size:1rem !important;
+}
+
 .form-floating{
     margin-bottom: 15px;
 }
@@ -166,7 +171,7 @@ body{
 
 .write-post-form{
     width: 30%;
-    min-width:300px;
+    min-width:400px;
     min-height:30%;
 }
 
@@ -179,11 +184,11 @@ body{
 }
 
 .new-post-content-input{
-    min-height:200px !important;
-    max-height:300px;
-
+    min-height:300px !important;
+    max-height:400px;
 }
 
 .credentials-input{
     border:1px solid black;
 }
+

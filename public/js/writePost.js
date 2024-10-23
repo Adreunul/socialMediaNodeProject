@@ -46,7 +46,6 @@ form.addEventListener('submit', async (event) => {
         if (response.ok && data.status === 'success') {
             window.location.href = '/home';
         } else {
-            console.log("ai belit pl");
             alert(data.message);
         }
 

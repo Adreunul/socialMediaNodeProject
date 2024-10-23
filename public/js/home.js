@@ -35,6 +35,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// event listener on user scrolling the page
+
+window.onscroll = async function() {
+    //console.log("salut");
+}
+
 
 
 function displayPosts(posts, postsContainer){
@@ -65,6 +71,7 @@ function displayPosts(posts, postsContainer){
                     <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostDate(post)}</p>
                     <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostHour(post)}</p>
                 </div>
+                <p class="${post.edited === 1 ? '' : 'invisible'}" style="font-size:0.8rem;margin-bottom:0px !important;margin-top:5px !important;">Edited</p>
             </div>
         </div>
     `;
@@ -140,9 +147,11 @@ async function handleDeletePost(post, postCard){
                     <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostDate(post)}</p>
                     <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostHour(post)}</p>
                 </div>
+                <p class="${post.edited === 1 ? '' : 'invisible'}" style="font-size:0.8rem;margin-bottom:0px !important;margin-top:5px !important;">Edited</p>
             </div>
         </div>
     `;
+
 
         const editButton = postCard.querySelector('.edit-post');
         const deleteButton = postCard.querySelector('.delete-post');
@@ -158,28 +167,56 @@ async function handleDeletePost(post, postCard){
             handleDeletePost(post, postCard); // Call the delete post handler with post ID
         });
     });
+    
+
+    setTimeout(() => {
+        cancelButton.click(); // Simulate a click on the cancel button
+    }, 3000);
+}
+
+async function handleEditPost(post){
+        window.location.href = `/edit-post/${post.id}`;
 }
 
 function formatPostDate(post) {
     const postDate = new Date(post.date);
     const now = new Date();
 
-    // Get the current week's start and end dates
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 6));
+    // Get the start of today and yesterday
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
 
-    // Reset time to 00:00:00 to just compare the date portion
+    const startOfYesterday = new Date(now);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    startOfYesterday.setHours(0, 0, 0, 0);
+
+    // Get the current week's start and end dates
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
+
+    // Check if the postDate is today
+    if (postDate >= startOfToday && postDate < now) {
+        return 'Today';
+    }
+
+    // Check if the postDate is yesterday
+    if (postDate >= startOfYesterday && postDate < startOfToday) {
+        return 'Yesterday';
+    }
 
     // Check if the postDate is within the current week
     if (postDate >= startOfWeek && postDate <= endOfWeek) {
-        // If in the current week, display weekday and time (split by <br>)
+        // If in the current week, display the weekday
         const weekday = postDate.toLocaleDateString('en-US', { weekday: 'long' });
         return `${weekday}`;
     } else {
-        // If not in the current week, display full date and time (split by <br>)
-        const date = postDate.toLocaleDateString('en-US', {
+        // If not in the current week, display full date
+        const date = postDate.toLocaleDateString('en-GB', {
             year: 'numeric',
             month: 'numeric',
             day: 'numeric'
@@ -187,6 +224,7 @@ function formatPostDate(post) {
         return date;
     }
 }
+
 
 function formatPostHour(post){
     const postDate = new Date(post.date);
@@ -198,13 +236,3 @@ function formatPostHour(post){
 
     return time;
 }
-
-
-
-
-// const userActions = document.getElementsByClassName("user-action");
-
-// for (let i = 0; i < userActions.length; i++) {
-//     userActions[i].classList.add("active");
-//     userActions[i].classList.remove("disabled");
-// }
