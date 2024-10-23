@@ -6,7 +6,7 @@ import pg from 'pg';
 const app = express();
 
 app.use(express.static('public'));
-app.set('view engine', 'ejs');
+//app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var idCurrentUser = 0;
@@ -20,23 +20,28 @@ let post = {
 posts.push(post);
 
 app.get("/", (req, res) => {
-
-    res.render("home", { 
+    res.render("home.ejs", { 
         posts: posts,
         idCurrentUser: idCurrentUser
      });
 });
 
 app.get("/login", (req, res) => {
-    res.render("login", {
+    res.render("login.ejs", {
         idCurrentUser: idCurrentUser,
     });
 });
 
 app.get("/register", (req, res) => {
-    res.render("register", {
+    res.render("register.ejs", {
         idCurrentUser: idCurrentUser,
     });
+});
+
+app.post("/register", (req, res) => {
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
 });
 
 app.get("/writePost", (req, res) => {
