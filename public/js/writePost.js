@@ -21,6 +21,7 @@ form.addEventListener('submit', async (event) => {
         }
         else {
             console.error('Failed to fetch session');
+            return;
         }
     } catch(error) {
         console.error('Failed to fetch session', error);

@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import pg from 'pg';
 import authRoutes from './routes/authRoutes.js';
 import postsRoutes from './routes/postsRoutes.js';
+import commentsRoutes from './routes/commentRoutes.js';
 import { requireAuth } from './middleware/authMiddleware.js';
 
 const __dirname = path.resolve();
@@ -29,6 +30,7 @@ app.use(session({
 );
 app.use('/api/v1/auth/', authRoutes);
 app.use('/api/v1/posts/', postsRoutes);
+app.use('/api/v1/comments/', commentsRoutes);
 
 app.get("/", (req, res) => {
    res.sendFile(path.join(__dirname, 'public', 'login.html'));
@@ -52,6 +54,10 @@ app.get("/write-post", requireAuth, (req, res) => {
 
 app.get("/edit-post/:id", requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'edit-post.html'));
+});
+
+app.get("/comment-post/:id", requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'comment-post.html'));
 });
 
 app.get("/profile", requireAuth, (req, res) => {

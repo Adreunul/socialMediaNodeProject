@@ -1,12 +1,20 @@
 import express from 'express';
 import controller from '../controllers/postsController.js';
+import { requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/getAllPosts', controller.getAllPosts);
+router.get('/getAllPosts', requireAuth, controller.getAllPosts);
 router.get('/getPostById/:id', controller.getPostById);
-router.post('/writePost', controller.writeNewPost);
-router.patch('/editPost', controller.editPost);
-router.delete('/deletePost/:id', controller.deletePost);
+router.get('/getUserHasLiked/:id_post/:id_user', controller.getUserHasLiked);
+
+router.post('/writePost', requireAuth, controller.writeNewPost);
+router.post('/setUserReaction/:id_post/:id_user/:likes', requireAuth, controller.setUserReaction);
+
+router.patch('/editPost', requireAuth, controller.editPost);
+router.patch('/toggleUserReaction/:id_post/:id_user/:likes', requireAuth, controller.editUserReaction);
+
+router.delete('/deletePost/:id', requireAuth, controller.deletePost);
+router.delete('/deleteUserReaction/:id_post/:id_user', requireAuth, controller.deleteUserReaction);
 
 export default router;

@@ -1,3 +1,13 @@
+
+
+:root {
+    --bs-btn-hover-border-color: rgba(255, 102, 0, 1) !important;
+}
+
+.btn-primary{
+    --bs-btn-hover-border-color: rgba(255, 102, 0, 1) !important;
+}
+
 .form-control:focus {
     border-color: rgb(255, 125, 41) !important; /* Orange border */
     box-shadow: 0 0 0 0.25rem rgba(255, 125, 41, 0.25); /* Orange focus ring */
@@ -32,8 +42,21 @@ body{
     background-color: rgb(255, 125, 41) !important;
 }
 
+.nav-link{
+    border-radius:25%;
+    width:fit-content;
+}
+
+.nav-link:hover{
+    background-color: rgba(253, 101, 0, 0.616) !important;
+}
+
+.nav-link:hover::after{
+    
+}
+
 .navbar-brand{
-    background-color: rgb(255, 102, 0) !important;
+    background-color: #ff6600 !important;
     padding:10px !important;
     border: 2px solid black;
     border-radius:5%;
@@ -57,6 +80,9 @@ body{
     height:60vh;
     align-items: center;
     justify-content: center;
+}
+
+.card-body{
 }
 
 .log-in-button-container{
@@ -121,9 +147,13 @@ body{
 
 .card{
     width: 33% !important;
-    min-width:400px !important;
+    min-width:600px !important;
     border: 2px solid black;
     margin-bottom: 20px;
+}
+
+.comment-card{
+    min-width:400px !important;
 }
 
 
@@ -165,9 +195,100 @@ body{
     background-color:black;
 }
 
+.post-interaction-container{
+    width: 25%;
+    height:60px;
+    padding:2px;
+    min-width:150px;
+    height:100%;
+    background-color: rgba(255, 152, 84, 0.897);
+    border:1px solid rgba(36, 35, 35, 0.829);
+    border-radius:10%;
+}
+
+.post-interaction-button{
+    font-size:1.8rem;
+    font-style:bold;
+    border-radius: 15%;
+    width:50%;
+    height:50%;
+}
+
+.post-like-button-pressed{
+    background-color: white !important;
+    font-size:2rem;
+    color: #ff6600 !important;
+    height:auto;
+}
+
+.post-dislike-button-pressed{
+    background-color: #ff6600 !important;
+    font-size:2rem;
+    color: white !important;
+    height:auto;
+}
+
+.post-interaction-count{
+    margin-left: 10px;
+    margin-right:10px;
+}
+
+.post-interaction-info{
+    font-size:.75rem !important;
+}
+
+.post-comment-button-container{
+    width:25%;
+}
+
+.comment-section-label-container{
+    background-color: #ff985499;
+    border:2px solid rgba(36, 35, 35, 0.829);
+    border-radius:2.5%;
+}
+
+.comment-section-label{
+    background-color: #ff9854bd;
+    font-size:1.5rem;
+    font-style:bold;
+    color: black;
+    margin-top:5px;
+    border:1px solid rgba(36, 35, 35, 0.829);
+    border-radius:10%;
+    padding:10px;
+}
+
+.comment-button{
+    width:75%;
+    height:60.67px;
+    padding:2px;
+    border-radius:10%;
+    background-color: rgba(255, 152, 84, 0.897);
+    border:1px solid rgba(36, 35, 35, 0.829);
+}
+
+.comments-container{
+    max-height: 1000px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.comment-section{
+    height:100%;
+    width: 75%;
+}
+
+.write-new-comment-button{
+    background-color: #ff9854bd;
+    color: black;
+    border: 2px solid black;
+    border-radius: 10%;
+}
+
 .invisible{
     display:none;
 }
+
 
 .write-post-form{
     width: 30%;
