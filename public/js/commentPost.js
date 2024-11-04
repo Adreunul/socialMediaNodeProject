@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(response.ok) {
             const data = await response.json();
             console.log(data);
-            await displayPost(data);
+            await displayPost(data[0]);
             try{
                 //displayComments(data);
                 const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
@@ -60,7 +60,7 @@ async function displayPost(post) {
         userHasLiked = true;
         userHasDisliked = false;
     } else {
-        const userInteraction = await getUserHasLiked(post.post_id);
+        const userInteraction = await getUserHasLiked(post.post_id, "post");
         if (userInteraction === 1) {
             userHasLiked = true;
             userHasDisliked = false;
@@ -156,9 +156,9 @@ async function displayPost(post) {
             }
 
             if(likeButton.classList.contains("post-like-button-pressed")){
-                setUserReaction(post.post_id, currentUserId, 1);
+                setUserReaction(post.post_id, currentUserId, 1, "post");
             } else {
-                deleteUserReaction(post.post_id, currentUserId);
+                deleteUserReaction(post.post_id, currentUserId, "post");
             }
         });
 
@@ -172,9 +172,9 @@ async function displayPost(post) {
             }
 
             if(dislikeButton.classList.contains("post-dislike-button-pressed")){
-                setUserReaction(post.post_id, currentUserId, 0);
+                setUserReaction(post.post_id, currentUserId, 0, "post");
             } else {
-                deleteUserReaction(post.post_id, currentUserId);
+                deleteUserReaction(post.post_id, currentUserId, "post");
             }
         });
     } else {
@@ -204,6 +204,7 @@ async function displayComments(comments) {
 
     if(comments != null){ //if there are comms
         for(let i = 0; i < comments.length; i++) { //we show them all
+        console.log("comment id: " + comments[i].comment_id + "comment likes: " + comments[i].likes);
         const comment = comments[i];
         const commentCard = document.createElement("div");
         commentCard.className = "card comment-card";
@@ -211,25 +212,59 @@ async function displayComments(comments) {
         commentCard.style.minWidth = "50px";
         commentCard.style.marginTop = "10px";
 
+        var userHasLiked = await getUserHasLiked(comment.comment_id, "comment");
+
         commentCard.innerHTML = `
-        <div class="card-body" style="background-color: #ff9854bd;padding-bottom:0px !important;">
+    <div class="card-body" style="background-color: #ff9854bd;padding-bottom:0px !important;">
         <p class="text card-text">
             ${comment.text}
         </p>
         <hr class="content-underline" style="margin-bottom:5px !important;">
-            <div class="post-info-container" style="display: flex; justify-content: center;">
-                <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center;width:100%;">
-                    <div class="author-info" style="display: flex; flex-direction: column; align-items: center;">
-                        <h6 class="author" style="text-align: center;">
-                            ${comment.username}
-                        </h6>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-        commentsContainer.appendChild(commentCard);
+        <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <h6 class="author" style="text-align: center;">
+                ${comment.username}
+            </h6>
 
+            <!-- Button with counter -->
+            <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
+                &#x21e7
+
+                <!-- Counter in the top-right corner -->
+                <p class="like-counter" style="position: absolute; top: 2px; right: 2px; font-size: 12px; color: black; margin: 0;">
+                    ${comment.likes}
+                </p>
+            </button>
+        </div>
+    </div>
+`;
+
+    const likeButton = commentCard.querySelector(".like-button");
+    const likeCounter = commentCard.querySelector(".like-counter");
+
+    likeButton.addEventListener("click", async (event) => {
+        likeButton.classList.toggle("post-like-button-pressed");
+
+        if(likeButton.classList.contains("post-like-button-pressed")) {
+            setUserReaction(comment.comment_id, currentUserId, 1, "comment");
+            console.log("comment likes: " + comment.likes);
+            if(comment.likes == 0) {
+                likeCounter.textContent = parseInt(likeCounter.textContent) + 1;
+            }
+        }
+        else {
+            deleteUserReaction(comment.comment_id, currentUserId, "comment");
+            if(likeCounter.textContent === "1")
+                likeCounter.textContent = parseInt(likeCounter.textContent) - 1;
+        }
+        
+    
+        // if(likeButton.classList.contains("post-like-button-pressed")){
+        //     setUserReaction(post.post_id, currentUserId, 1);
+        // } else 
+        //     deleteUserReaction(post.post_id, currentUserId);
+        });
+        
+        commentsContainer.appendChild(commentCard);
         }
     }
     else{ //if there are no comms
@@ -321,39 +356,70 @@ async function toggleUserToComment(toggleTo, writeNewCommentCard) {
 
 }
 
-async function getUserHasLiked(postId) {
-    try {
-      console.log("eu asa trimit post id: " + postId);
-      console.log("eu asa trimit user id: " + currentUserId);
-      const response = await fetch('/api/v1/posts/getUserHasLiked/' + postId + '/' + currentUserId);
+async function getUserHasLiked(Id, whatToLike) {
+    if(whatToLike === "post") {
+        try {
+        const response = await fetch('/api/v1/posts/getUserHasLiked/' + Id + '/' + currentUserId);
   
-      const data = await response.json();
+        const data = await response.json();
   
-      if (response.ok && data.userInteraction !== null) {
-        return data.userInteraction;
-      } else
-        return null;
-    } catch(error) {
-      console.error("Failed to get user has liked", error);
+        if (response.ok && data.userInteraction !== null) {
+            return data.userInteraction;
+        } else
+            return null;
+        } catch(error) {
+        console.error("Failed to get user has liked", error);
+        }
+    } else if(whatToLike === "comment") {
+        try{
+            const response = await fetch('/api/v1/comments/getUserHasLiked/' + Id + '/' + currentUserId);
+            console.log("post id: " + Id + " user id: " + currentUserId);
+            const data = await response.json();
+
+            if(response.ok && data.userInteraction !== null) {
+                return data.userInteraction;
+            } else{
+                return null;
+            }
+        } catch(error){
+            console.error("Failed to get user has liked", error);
+        }
     }
     
   }
   
-  async function setUserReaction(postId, userId, reaction) {
-    try {
-      const response = await fetch('/api/v1/posts/setUserReaction/' + postId + '/' + userId + '/' + reaction, {
-        method: "POST",
-      });
+  async function setUserReaction(Id, userId, reaction, reactTo) {
+    if(reactTo === "post") {
+        try {
+        const response = await fetch('/api/v1/posts/setUserReaction/' + Id + '/' + userId + '/' + reaction, {
+            method: "POST",
+        });
   
-      const data = await response.json();
+        const data = await response.json();
   
-      if (response.ok && data.status === "success") {
-        return data;
-      } else {
-        console.error("Failed to set user reaction");
-      }
+        if (response.ok && data.status === "success") {
+            return true;
+        } else {
+            console.error("Failed to set user reaction");
+        }
     } catch(error) {
       console.error("Failed to set user reaction", error);
+    }
+    } else if(reactTo === "comment") { 
+        try{
+            const response = await fetch('/api/v1/comments/setUserReaction/' + Id + '/' + userId, {
+                method: "POST",
+            });
+            const data = await response.json();
+
+            if(response.ok && data.status === "success") {
+                return true;
+            } else {
+                console.error("Failed to set user reaction");
+            }
+        } catch(error) {
+            console.error("Failed to set user reaction", error);
+        }
     }
   }
   
@@ -375,22 +441,41 @@ async function getUserHasLiked(postId) {
      }
   }
   
-  async function deleteUserReaction(postId, userId) {
-    try{
-      const response = await fetch('/api/v1/posts/deleteUserReaction/' + postId + '/' + userId, {
-        method: "DELETE",
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok && data.status === "success") {
-        return data;
-      } else {
-        console.error("Failed to delete user reaction");
-      }
-    } catch(error) {
-      console.error("Failed to delete user reaction", error);
+  async function deleteUserReaction(Id, userId, reactionTo) {
+    if(reactionTo === "post") {
+        try{
+            const response = await fetch('/api/v1/posts/deleteUserReaction/' + Id + '/' + userId, {
+              method: "DELETE",
+            });
+        
+            const data = await response.json();
+        
+            if (response.ok && data.status === "success") {
+              return true;
+            } else {
+              console.error("Failed to delete user reaction");
+            }
+          } catch(error) {
+            console.error("Failed to delete user reaction", error);
+          }
+    } else if(reactionTo === "comment") {
+        try{
+            const response = await fetch('/api/v1/comments/deleteUserReaction/' + Id + '/' + userId, {
+              method: "DELETE",
+            });
+        
+            const data = await response.json();
+        
+            if (response.ok && data.status === "success") {
+              return true;
+            } else {
+              console.error("Failed to delete user reaction");
+            }
+          } catch(error) {
+            console.error("Failed to delete user reaction", error);
+          }
     }
+    
   }
   
   function formatPostDate(post) {

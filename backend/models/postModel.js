@@ -22,7 +22,7 @@ export const getPostById = async (id) => {
         const result = await pool.query(query, [id]);
 
         if (result.rows.length > 0) {
-            return result.rows[0];
+            return result.rows;
         } else {
             return null;
         }

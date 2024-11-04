@@ -17,7 +17,8 @@ export const getPostById = async (req, res) => {
     console.log("id: "+id);
 
     try {
-        const post = await Post.getPostById(id);
+        var post = await Post.getPostById(id);
+        post = await formatReactionsNumber(post);
         res.status(200).json(post);
     }   catch (error) {
         console.error("Error getting post", error);
@@ -169,21 +170,7 @@ export const deleteUserReaction = async (req, res) => {
     }
 };
 
-function checkPost(title, content){
-    var space = false;
-    // for(let i = 0; i < title.length; i++) {
-    //     if(title[i] == " " && space == false) {
-    //         space = true;
-    //         continue;
-    //     } else if(title[i] == " " && space == true) {
-    //         title[i] = "";
-    //         continue;
-    //     }
-    //     space = false;
-    // }
-
-    console.log("title: "+title);
-    
+function checkPost(title, content){  
     if(title.split(" ").length > 10 || title.length > 100)
         return "title";
     if(content.split(" ").length > 100 || content.length > 1200)
