@@ -30,8 +30,23 @@
     </div>
   
   <div class="container-body">
+    <div class="filtering-buttons-container">
+        <button class="filtering-button filtering-button-pressed" id="most-recent-filter-button">Most recent</button>
+        <button class="filtering-button" id="most-popular-filter-button">Most popular</button>
+
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle filtering-button dropdown-filter" id="dropdown-menu" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            All Posts
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" id="all-posts-filter-button" href="#">All Posts</a></li>
+            <li><a class="dropdown-item" id="my-posts-filter-button" href="#">My Posts</a></li>
+          </ul>
+        </div>
+    </div>
+
     <div class="posts-container" id="posts-container">
-        
+           
    </div>
 </div>
 

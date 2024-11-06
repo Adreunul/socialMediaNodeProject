@@ -12,6 +12,27 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
+export const getPostsByFilter = async (req, res) => {
+    try {
+        const orderFilter = req.params.order_filter;
+        const postFilter = req.params.post_filter;
+        const currentUserId = req.params.current_user_id;
+
+        var order_filter = "";
+        if(orderFilter === "mostRecent") 
+            order_filter = "post_id";
+          else
+            order_filter = "reactions_number";
+
+        var posts = await Post.getPostsByFilter(order_filter, postFilter, currentUserId);
+        posts = await formatReactionsNumber(posts);
+        res.json(posts);
+    } catch (error) {
+        console.error("Error getting posts", error);
+        res.status(500).send('Internal server error');
+    }
+};
+
 export const getPostById = async (req, res) => {
     const id = req.params.id;
     console.log("id: "+id);
@@ -22,7 +43,7 @@ export const getPostById = async (req, res) => {
         res.status(200).json(post);
     }   catch (error) {
         console.error("Error getting post", error);
-        res.status(500).send('Internal server error');
+        res.status(500).json({ status: 'error', message: 'Failed to get post' });
     }
 };
 
@@ -216,6 +237,7 @@ async function formatReactionsNumber(posts) {
 
 export default {
     getAllPosts,
+    getPostsByFilter,
     getPostById,
     writeNewPost,
     editPost,

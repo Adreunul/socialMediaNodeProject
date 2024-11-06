@@ -16,6 +16,34 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
+export const getPostsByFilter = async (orderFilter, postFilter, currentUserId) => {
+    try{
+        console.log("orderFilter: " + orderFilter);
+        const query = 
+        'SELECT p.id post_id, p.title, p.text, p.date, p.id_author, p.edited, u.username, ' +
+        '(SELECT COUNT(id) FROM likes_users_posts WHERE id_post = p.id) AS reactions_number, ' +
+        '(SELECT FLOOR(((SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id AND likes = 1)::FLOAT / ' +
+        '(SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id)) * 100) AS agree_percentage) ' +
+        'FROM posts p JOIN users u ON p.id_author = u.id ' +
+        (postFilter === "myPosts" ? 'WHERE p.id_author = $1 ' : '') +
+        `ORDER BY ${orderFilter} DESC;`;
+
+        const result = await pool.query(query, postFilter === "myPosts" ? [currentUserId] : []);
+
+
+        if (result.rows.length > 0) {
+            console.log("result.rows: " + result.rows);
+            return result.rows;
+        } else {
+            console.log("caca maca");
+            return null;
+        }
+    } catch (error){
+        console.error("Error querying the database", error);
+        throw error;
+    }
+};
+
 export const getPostById = async (id) => {
     try{
         const query = 'SELECT p.id post_id, p.title, p.text, p.date, p.id_author, p.edited, u.username, (SELECT COUNT(id) reactions_number FROM likes_users_posts WHERE id_post = p.id), (SELECT FLOOR(((SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id AND likes = 1)::FLOAT / (SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id)) * 100) AS agree_percentage) FROM posts p JOIN users u ON p.id_author = u.id WHERE p.id = $1;';
@@ -139,6 +167,7 @@ export const deleteUserReaction = async (id_post, id_user) => {
 
 export default {
     getAllPosts,
+    getPostsByFilter,
     getPostById,
     createPost,
     updatePost,

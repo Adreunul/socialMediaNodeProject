@@ -1,9 +1,12 @@
 import "./header.js";
 
 let currentUserId = null;
+let orderingFilter = "mostRecent";
+let postsFilter = "allPosts";
+
+const postsContainer = document.getElementById("posts-container");
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const postsContainer = document.getElementById("posts-container");
 
   try {
     const response = await fetch("/api/v1/auth/session");
@@ -18,25 +21,82 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Failed to fetch session", error);
   }
 
-  try {
-    const response = await fetch("/api/v1/posts/getAllPosts");
-    if (response.ok) {
-      const posts = await response.json();
-      console.log(posts);
-      displayPosts(posts, postsContainer);
-    } else {
-      console.error("Failed to fetch posts");
-      postsContainer.innerHTML = "<p>No posts available</p>";
+  // try {
+  //   const response = await fetch("/api/v1/posts/getAllPosts");
+  //   if (response.ok) {
+  //     const posts = await response.json();
+  //     console.log(posts);
+  //     displayPosts(posts, postsContainer);
+  //   } else {
+  //     console.error("Failed to fetch posts");
+  //     postsContainer.innerHTML = "<p>No posts available</p>";
+  //   }
+  // } catch (error) {
+  //   console.error("Failed to fetch posts", error);
+  //   postsContainer.innerHTML =
+  //     "<p>Error loading posts. Please try again later.</p>";
+  // }
+
+  requestPosts();
+});
+
+const filterMostRecentButton = document.getElementById("most-recent-filter-button");
+const filterMostPopularButton = document.getElementById("most-popular-filter-button");
+const dropdownMenu = document.getElementById("dropdown-menu");
+const allPostsButton = document.getElementById("all-posts-filter-button");
+const myPostsButton = document.getElementById("my-posts-filter-button");
+
+filterMostRecentButton.addEventListener("click", async (event) => {
+  if(orderingFilter !== "mostRecent") {
+    filterMostPopularButton.classList.toggle("filtering-button-pressed");
+      filterMostRecentButton.classList.toggle("filtering-button-pressed");
+      orderingFilter = "mostRecent";
+      requestPosts();
     }
-  } catch (error) {
-    console.error("Failed to fetch posts", error);
-    postsContainer.innerHTML =
-      "<p>Error loading posts. Please try again later.</p>";
+});
+
+filterMostPopularButton.addEventListener("click", async (event) => {
+    if(orderingFilter !== "mostPopular") {
+      filterMostPopularButton.classList.toggle("filtering-button-pressed");
+      filterMostRecentButton.classList.toggle("filtering-button-pressed");
+      orderingFilter = "mostPopular";
+      requestPosts();
+    }
+});
+
+allPostsButton.addEventListener("click", async (event) => {
+  if(postsFilter !== "allPosts") {
+    dropdownMenu.innerText = "All Posts";
+    postsFilter = "allPosts";
+    requestPosts();
   }
 });
 
+myPostsButton.addEventListener("click", async (event) => {
+  if(postsFilter !== "myPosts") {
+    dropdownMenu.innerText = "My Posts";
+    postsFilter = "myPosts";
+    requestPosts();
+  }
+});
 
-async function displayPosts(posts, postsContainer) {
+async function requestPosts() {
+  try {    
+    const response = await fetch(`/api/v1/posts/getPostsByFilter/${orderingFilter}/${postsFilter}/${currentUserId}`);
+    if (response.ok) {
+      const posts = await response.json();
+      displayPosts(posts);
+    } else {
+      console.error("Failed to fetch posts");
+      return null;
+    }
+  } catch (error) {
+    console.error("Failed to fetch posts", error);
+    return null;
+  }
+}
+
+async function displayPosts(posts) {
   postsContainer.innerHTML = "";
 
   for (let i = 0; i < posts.length; i++) {
@@ -188,7 +248,7 @@ async function displayPosts(posts, postsContainer) {
 
     deleteButton.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent default anchor behavior
-        handleDeletePost(post, postCard); // Call the delete post handler with post ID
+        handleDeletePost(post, postCard, userHasLiked, userHasDisliked); // Call the delete post handler with post ID
     });
 
     postsContainer.appendChild(postCard);
@@ -196,7 +256,7 @@ async function displayPosts(posts, postsContainer) {
 
 }
 
-async function handleDeletePost(post, postCard) {
+async function handleDeletePost(post, postCard, userHasLiked, userHasDisliked) {
   var initialCardHeight = postCard.clientHeight;
   postCard.innerHTML = `
     <div class="card-body" style="height:${initialCardHeight}px !important; display:flex;flex-direction:column;align-items:center;justify-content:center;">
@@ -233,52 +293,130 @@ async function handleDeletePost(post, postCard) {
   cancelButton.addEventListener("click", (event) => {
     event.preventDefault();
     postCard.innerHTML = `
-        <div class="card-body">
-            <h5 class="text card-title" style="text-align: center;font-size:1.35rem;">${
-              post.title
-            }</h5>
-            <hr class="title-underline">
-            <p class="text card-text">${post.text}</p>
-            <hr class="content-underline">
-            <h6 class="author" style="text-align:center">Written by: ${
-              post.username
-            }</h6>
-            <div class="author-buttons" style="margin-bottom:10px !important;">
-                <a href="#" class="edit-post card-link ${
-                  post.id_author === currentUserId ? "" : "invisible"
-                }">Edit Post</a>
-                <a href="#" class="delete-post card-link ${
-                  post.id_author === currentUserId ? "" : "invisible"
-                }">Delete Post</a>
-            </div>
-            <div class="post-date" style="display:flex;flex-direction:column;align-items:center;">
-                <div class="post-date-area" style="width:fit-content;height:fit-content;display:flex;flex-direction:column;align-items:center;background-color: rgba(0, 0, 0, 0.075);padding:5px;border:0.75px solid darkgray;border-radius:25%;">
-                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostDate(
-                      post
-                    )}</p>
-                    <p style="font-size:0.8rem;margin-bottom:0px !important;">${formatPostHour(
-                      post
-                    )}</p>
+    <div class="card-body">
+        <h5 class="text card-title" style="text-align: center; font-size: 1.35rem;">
+            ${post.title}
+        </h5>
+        <hr class="title-underline">
+        <p class="text card-text">
+            ${post.text}
+        </p>
+        <hr class="content-underline">
+
+
+            <div class="post-info-container" style="display: flex; justify-content: space-between;">
+                <div class="post-interaction-container" style="display: flex;">
+                    <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="background-color: #dfdfdfc9; color: #d15400d8;">
+                        &#x21e7
+                    </button>
+                    <button class="post-interaction-button dislike-button ${userHasDisliked ? "post-dislike-button-pressed" : ""}" style="background-color: #d15400d8; color: #dfdfdfc9;">
+                        &#x21e9
+                    </button>
+
+                    <div class="post-interaction-count-container" style="display: flex; flex-direction: column; align-items: center;">
+                        <p class="post-interaction-info post-interaction-count" style="margin-bottom: 0px !important;">
+                            ${post.reactions_number} ${post.reactions_number == 1 ? "reaction" : "reactions"}
+                        </p>
+
+                        <p class="post-interaction-info post-interaction-percentage" style="margin-bottom: 0px !important;">
+                            ${post.agree_percentage}% agree
+                        </p>
+                    </div>
                 </div>
-                <p class="${
-                  post.edited === 1 ? "" : "invisible"
-                }" style="font-size:0.8rem;margin-bottom:0px !important;margin-top:5px !important;">Edited</p>
+
+                <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center;width:50%;">
+
+                <div class="post-date" style="display: flex; flex-direction: column; align-items: center;margin-bottom:10px;">
+                    <div class="post-date-area" style="width: fit-content; height: fit-content; display: flex; flex-direction: column; align-items: center; background-color: rgba(0, 0, 0, 0.075); padding: 5px; border: 0.75px solid darkgray; border-radius: 25%;min-width:80px;">
+                        <p style="font-size: 0.8rem; margin-bottom: 0px !important;">
+                            ${formatPostDate(post)}
+                        </p>
+                        <p style="font-size: 0.8rem; margin-bottom: 0px !important;">
+                            ${formatPostHour(post)}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="author-info" style="display: flex; flex-direction: column; align-items: center;">
+                <h6 class="author" style="text-align: center;">
+                    Written by: ${post.username}
+                </h6>
+                <div class="author-buttons" style="margin-bottom: 10px !important;">
+                    <a href="#" class="edit-post card-link ${post.id_author === currentUserId ? "" : "invisible"}">Edit</a>
+                    <a href="#" class="delete-post card-link ${post.id_author === currentUserId ? "" : "invisible"}">Delete</a>
+                </div>
+                <p class="${post.edited === 1 ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 0px !important; margin-top: 5px !important;">
+                        Edited
+                    </p>
+                </div>
+
+                </div>
+
+                <div class="post-comment-button-container" style="display:flex;flex-direction:row-reverse;">
+                  <button class="comment-button" style="color: black;">
+                      <img src="/img/commentButton.png" alt="comment button" style="width: 50px; height: 50px;">
+                  </button>
+                </div>
             </div>
-        </div>
-    `;
+    </div>
+`;
 
     const editButton = postCard.querySelector(".edit-post");
     const deleteButton = postCard.querySelector(".delete-post");
+    const likeButton = postCard.querySelector(".like-button");
+    const dislikeButton = postCard.querySelector(".dislike-button");
+    const commentButton = postCard.querySelector(".comment-button");
+
+    if (post.id_author !== currentUserId) {
+        likeButton.addEventListener("click", async (event) => {
+            likeButton.classList.toggle("post-like-button-pressed");
+
+            if (dislikeButton.classList.contains("post-dislike-button-pressed")){
+                dislikeButton.classList.remove("post-dislike-button-pressed");
+                toggleUserReaction(post.post_id, currentUserId, 1);
+                return;
+            }
+
+            if(likeButton.classList.contains("post-like-button-pressed")){
+                setUserReaction(post.post_id, currentUserId, 1);
+            } else {
+                deleteUserReaction(post.post_id, currentUserId);
+            }
+        });
+
+        dislikeButton.addEventListener("click", async (event) => {
+            dislikeButton.classList.toggle("post-dislike-button-pressed");
+
+            if (likeButton.classList.contains("post-like-button-pressed")){
+                likeButton.classList.remove("post-like-button-pressed");
+                toggleUserReaction(post.post_id, currentUserId, 0);
+                return;
+            }
+
+            if(dislikeButton.classList.contains("post-dislike-button-pressed")){
+                setUserReaction(post.post_id, currentUserId, 0);
+            } else {
+                deleteUserReaction(post.post_id, currentUserId);
+            }
+        });
+    } else {
+        likeButton.classList.add("post-like-button-pressed");
+    }
+
+    commentButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        handleCommentPost(post);
+    });
 
     // Add click event listeners to the buttons
     editButton.addEventListener("click", (event) => {
-      event.preventDefault(); // Prevent default anchor behavior
-      handleEditPost(post); // Call the edit post handler with post data
+        event.preventDefault(); // Prevent default anchor behavior
+        handleEditPost(post); // Call the edit post handler with post data
     });
 
     deleteButton.addEventListener("click", (event) => {
-      event.preventDefault(); // Prevent default anchor behavior
-      handleDeletePost(post, postCard); // Call the delete post handler with post ID
+        event.preventDefault(); // Prevent default anchor behavior
+        handleDeletePost(post, postCard, userHasLiked, userHasDisliked); // Call the delete post handler with post ID
     });
   });
 

@@ -2,6 +2,8 @@ import "./header.js";
 
 let currentUserId = null;
 let postId = null;
+let orderingFilter = "mostRecent";
+let commentFilter = "allComments";
 
 const url = window.location.href;
 postId = url.split('/').pop();
@@ -21,28 +23,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to fetch session', error);
     }
 
+    await requestPostsById();
+
+    // try{
+    //     const response = await fetch('/api/v1/posts/getPostById/' + postId);
+    //     if(response.ok) {
+    //         const data = await response.json();
+    //         console.log(data);
+    //         await displayPost(data[0]);
+    //         try{
+    //             const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
+    //             if(response.ok) {
+    //                 const data = await response.json();
+    //                 console.log(data);
+    //                 await displayComments(data.comments);
+    //             }
+    //         } catch (error) {
+    //             console.error('Failed to fetch comments', error);
+    //         }
+    //     }
+    // } catch(error) {
+    //     console.error('Failed to fetch post', error);
+    // }
+});
+
+async function requestPostsById() {
     try{
         const response = await fetch('/api/v1/posts/getPostById/' + postId);
         if(response.ok) {
             const data = await response.json();
             console.log(data);
             await displayPost(data[0]);
-            try{
-                //displayComments(data);
-                const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
-                if(response.ok) {
-                    const data = await response.json();
-                    console.log(data);
-                    await displayComments(data.comments);
-                }
-            } catch (error) {
-                console.error('Failed to fetch comments', error);
-            }
+            
+            requestCommentsByPostId();
+            // try{
+            //     const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
+            //     if(response.ok) {
+            //         const data = await response.json();
+            //         console.log(data);
+            //         await displayComments(data.comments);
+            //     }
+            // } catch (error) {
+            //     console.error('Failed to fetch comments', error);
+            // }
         }
     } catch(error) {
         console.error('Failed to fetch post', error);
     }
-});
+}
+
+async function requestCommentsByPostId() {
+    try{
+        console.log("orderingFilter: " + orderingFilter + " commentFilter: " + commentFilter + " currentUserId: " + currentUserId + " postId: " + postId);
+        const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId + '/' + orderingFilter + '/' + commentFilter + '/' + currentUserId);
+        if(response.ok) {
+            const data = await response.json();
+            console.log(data);
+            await displayComments(data.comments);
+        }
+    } catch (error) {
+        console.error('Failed to fetch comments', error);
+    }
+}
 
 async function displayPost(post) {
     const postsContainer = document.getElementById('posts-container');
@@ -130,8 +172,29 @@ async function displayPost(post) {
             </div>
         <hr class="content-underline" style="margin-bottom:0px !important;height:.5px !important;">
 
-        <div class="comment-section-label-container" style="display: flex; justify-content: center;">
-            <h4 class="comment-section-label" style="text-align: center;">Comments</h4>
+        <div class="comment-section-label-container" style="display: flex;align-items:center;flex-direction:column;">
+            <h4 class="comment-section-label" style="text-align: center;width:fit-content;">Comments</h4>
+            <div class="comement-filter-container" style="display: flex; justify-content: center; align-items: center;">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle filtering-button dropdown-filter comment-filter comment-filter-order" id="dropdown-menu" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Most Recent
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" id="most-recent-filter-button" href="#">Most Recent</a></li>
+                        <li><a class="dropdown-item" id="most-popular-filter-button" href="#">Most Popular</a></li>
+                    </ul>
+                </div>    
+
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle filtering-button dropdown-filter comment-filter comment-filter-comments" id="dropdown-menu" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        All Comments
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" id="all-comments-filter-button" href="#">All Comments</a></li>
+                        <li><a class="dropdown-item" id="my-comments-filter-button" href="#">My Comments</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="comments-container" style="display: flex; flex-direction: column; align-items: center;">
@@ -144,6 +207,46 @@ async function displayPost(post) {
 
     const likeButton = postCard.querySelector(".like-button");
     const dislikeButton = postCard.querySelector(".dislike-button");
+
+    const dropdownOrderFilter = postCard.querySelector(".comment-filter-order");
+    const dropdownCommentFilter = postCard.querySelector(".comment-filter-comments");
+
+    const filterMostRecentButton = postCard.querySelector("#most-recent-filter-button");
+    const filterMostPopularButton = postCard.querySelector("#most-popular-filter-button");
+    const filterAllCommentsButton = postCard.querySelector("#all-comments-filter-button");
+    const filterMyCommentsButton = postCard.querySelector("#my-comments-filter-button");
+
+    filterMostRecentButton.addEventListener("click", async (event) => {
+        if(orderingFilter !== "mostRecent") {
+            orderingFilter = "mostRecent";
+            dropdownOrderFilter.textContent = "Most Recent";
+            requestCommentsByPostId();
+        }
+    });
+
+    filterMostPopularButton.addEventListener("click", async (event) => {
+        if(orderingFilter !== "mostPopular") {
+            orderingFilter = "mostPopular";
+            dropdownOrderFilter.textContent = "Most Popular";
+            requestCommentsByPostId();
+        }
+    });
+
+    filterAllCommentsButton.addEventListener("click", async (event) => {
+        if(commentFilter !== "allComments") {
+            commentFilter = "allComments";
+            dropdownCommentFilter.textContent = "All Comments";
+            requestCommentsByPostId();
+        }
+    });
+
+    filterMyCommentsButton.addEventListener("click", async (event) => {
+        if(commentFilter !== "myComments") {
+            commentFilter = "myComments";
+            dropdownCommentFilter.textContent = "My Comments";
+            requestCommentsByPostId();
+        }
+    });
 
     if (post.id_author !== currentUserId) {
         likeButton.addEventListener("click", async (event) => {
@@ -225,14 +328,15 @@ async function displayComments(comments) {
                 ${comment.username}
             </h6>
 
-            <!-- Button with counter -->
             <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
                 &#x21e7
-
-                <!-- Counter in the top-right corner -->
                 <p class="like-counter" style="position: absolute; top: 2px; right: 2px; font-size: 12px; color: black; margin: 0;">
                     ${comment.likes}
                 </p>
+            </button>
+
+            <button class="author-delete-button ${currentUserId === comment.user_id ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 2.5px !important; margin-top: 2.5px !important;background-color:#ffffff00;border:0.5px solid black;border-radius:7.5%;">
+                Delete
             </button>
         </div>
     </div>
@@ -240,6 +344,7 @@ async function displayComments(comments) {
 
     const likeButton = commentCard.querySelector(".like-button");
     const likeCounter = commentCard.querySelector(".like-counter");
+    const deleteButton = commentCard.querySelector(".author-delete-button");
 
     likeButton.addEventListener("click", async (event) => {
         likeButton.classList.toggle("post-like-button-pressed");
@@ -247,23 +352,24 @@ async function displayComments(comments) {
         if(likeButton.classList.contains("post-like-button-pressed")) {
             setUserReaction(comment.comment_id, currentUserId, 1, "comment");
             console.log("comment likes: " + comment.likes);
+            userHasLiked = true;
             if(comment.likes == 0) {
                 likeCounter.textContent = parseInt(likeCounter.textContent) + 1;
             }
         }
         else {
             deleteUserReaction(comment.comment_id, currentUserId, "comment");
+            userHasLiked = false;
             if(likeCounter.textContent === "1")
                 likeCounter.textContent = parseInt(likeCounter.textContent) - 1;
         }
-        
-    
-        // if(likeButton.classList.contains("post-like-button-pressed")){
-        //     setUserReaction(post.post_id, currentUserId, 1);
-        // } else 
-        //     deleteUserReaction(post.post_id, currentUserId);
         });
         
+        deleteButton.addEventListener("click", async (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleDeletePost(comment, commentCard, userHasLiked);
+        });
+
         commentsContainer.appendChild(commentCard);
         }
     }
@@ -289,14 +395,14 @@ async function displayComments(comments) {
 async function toggleUserToComment(toggleTo, writeNewCommentCard) {
     if(toggleTo === "comment") {
         writeNewCommentCard.innerHTML = `
-        <div class="card-body" style="background-color: #ff985499;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:2rem;padding-bottom:5px !important">
-        <textarea class="write-new-comment-textarea" style="width:100%;min-height:50%;height:100px;border:2px solid black;border-radius:5%;margin-bottom:5px;"></textarea>
-        <button class="write-new-comment-submit-button" style="width:40%;height:30%;background-color:#ff9854bd;border:2px solid black;border-radius:5%;">
-            Submit
-        </button>
-        <button class="cancel-new-comment-button" style="width:30%;height:15%;background-color:#ff9854bd;border:1px solid black;border-radius:5%;margin-top:3px;font-size:.75rem;">
-            Cancel
-        </button>
+        <div class="card-body" style="background-color: #ff985499;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:2rem;padding-bottom:5px !important;">
+            <textarea class="write-new-comment-textarea" style="width:100%;min-height:75px;height:100px;max-height:250px;border:2px solid black;border-radius:5%;margin-bottom:5px;"></textarea>
+            <button class="write-new-comment-submit-button" style="width:40%;height:30%;background-color:#ff9854bd;border:2px solid black;border-radius:5%;">
+                Submit
+            </button>
+            <button class="cancel-new-comment-button" style="width:30%;height:15%;background-color:#ff9854bd;border:1px solid black;border-radius:5%;margin-top:3px;font-size:.75rem;">
+                Cancel
+            </button>
         </div>
         `;
         var submitNewCommentButton = writeNewCommentCard.querySelector(".write-new-comment-submit-button");
@@ -325,9 +431,11 @@ async function toggleUserToComment(toggleTo, writeNewCommentCard) {
 
                 if(response.ok && data.status === "success") {
                     console.log("Comment written successfully");
-                    window.location.reload();
+                    //window.location.reload();
+                    requestCommentsByPostId();
                 } else{
                     console.error("Failed to write comment");
+                    alert("Failed to write comment : " + data.message);
                 }
             }catch(error) {
                 console.error("Failed to write comment", error);
@@ -353,7 +461,103 @@ async function toggleUserToComment(toggleTo, writeNewCommentCard) {
             toggleUserToComment("comment", writeNewCommentCard);
         });
     }
+}
 
+async function handleDeletePost(comment, commentCard, userHasLiked) {
+    var initialCardHeight = commentCard.clientHeight;
+    commentCard.innerHTML = `
+        <div class="card-body" style="height:${initialCardHeight}px !important; display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#ff985499;">
+        <h6 class="confirmation-text" style="text-align:center">Do you want to delete this Comment ?</h6>
+        <div class="author-buttons">
+            <a href="#" class="confirm-delete card-link">Delete my Comment</a>
+            <a href="#" class="stop-delete card-link">Cancel</a>
+        </div>
+    </div>
+    `;
+
+    const confirmButton = commentCard.querySelector(".confirm-delete");
+    const cancelButton = commentCard.querySelector(".stop-delete");
+
+    confirmButton.addEventListener("click", async (event) => {
+        try{
+            const response = await fetch('/api/v1/comments/deleteComment/' + comment.comment_id, {
+                method: "DELETE",
+            });
+            
+            const data = await response.json();
+
+            if(response.ok && data.status === "success") {
+                console.log("Comment deleted successfully");
+                //window.location.reload();
+                requestCommentsByPostId();
+            } else 
+                console.error("Failed to delete comment");
+
+        } catch(error) {
+            console.error("Failed to delete comment", error);
+        }
+    });
+
+    cancelButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        commentCard.innerHTML = `
+    <div class="card-body" style="background-color: #ff9854bd;padding-bottom:0px !important;">
+        <p class="text card-text">
+            ${comment.text}
+        </p>
+        <hr class="content-underline" style="margin-bottom:5px !important;">
+        <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <h6 class="author" style="text-align: center;">
+                ${comment.username}
+            </h6>
+
+            <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
+                &#x21e7
+                <p class="like-counter" style="position: absolute; top: 2px; right: 2px; font-size: 12px; color: black; margin: 0;">
+                    ${comment.likes}
+                </p>
+            </button>
+
+            <button class="author-delete-button ${currentUserId === comment.user_id ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 2.5px !important; margin-top: 2.5px !important;background-color:#ffffff00;border:0.5px solid black;border-radius:7.5%;">
+                Delete
+            </button>
+        </div>
+    </div>
+`;
+
+    const likeButton = commentCard.querySelector(".like-button");
+    const likeCounter = commentCard.querySelector(".like-counter");
+    const deleteButton = commentCard.querySelector(".author-delete-button");
+
+    likeButton.addEventListener("click", async (event) => {
+        likeButton.classList.toggle("post-like-button-pressed");
+
+        if(likeButton.classList.contains("post-like-button-pressed")) {
+            setUserReaction(comment.comment_id, currentUserId, 1, "comment");
+            console.log("comment likes: " + comment.likes);
+            userHasLiked = true;
+            if(comment.likes == 0) {
+                likeCounter.textContent = parseInt(likeCounter.textContent) + 1;
+            }
+        }
+        else {
+            deleteUserReaction(comment.comment_id, currentUserId, "comment");
+            userHasLiked = false;
+            if(likeCounter.textContent === "1")
+                likeCounter.textContent = parseInt(likeCounter.textContent) - 1;
+        }
+        });
+        
+        deleteButton.addEventListener("click", async (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            handleDeletePost(comment, commentCard, userHasLiked);
+        });
+    }); 
+
+    setTimeout(() => {
+        cancelButton.click(); // Simulate a click on the cancel button
+      }, 3000);
 }
 
 async function getUserHasLiked(Id, whatToLike) {

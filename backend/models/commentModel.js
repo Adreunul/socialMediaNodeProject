@@ -1,9 +1,9 @@
 import pool from '../db.js';
 
-export const getCommentsByPostId = async (id) => {
+export const getCommentsByPostId = async (id, orderFilter, commentFilter, currentUserId) => {
     try{
-        const query = 'SELECT c.id comment_id, c.text, u.username, (SELECT COUNT(id) AS likes FROM likes_users_comments WHERE id_comment = c.id) AS likes FROM comments_users_posts c JOIN users u ON c.id_user = u.id WHERE c.id_post = $1 ORDER BY c.id DESC';
-        const result = await pool.query(query, [id]);
+        const query = 'SELECT c.id comment_id, c.text, u.username, u.id user_id, (SELECT COUNT(id) AS likes FROM likes_users_comments WHERE id_comment = c.id) AS likes FROM comments_users_posts c JOIN users u ON c.id_user = u.id WHERE c.id_post = $1 ' + (commentFilter === "myComments" ? 'AND u.id = $2 ' : '') + ' ORDER BY ' + orderFilter + ' DESC;';
+        const result = await pool.query(query, commentFilter === "myComments" ? [id, currentUserId] : [id]);
 
         if (result.rows.length > 0)
             return result.rows;
@@ -26,6 +26,10 @@ export const createComment = async (id_post, id_user, text) => {
             return null;
     } catch (error) {
         console.error("Error querying the database", error);
+
+        if(error.detail.includes("already exists"))
+            return "duplicate";
+        
         return null;
     }
 };
@@ -75,10 +79,26 @@ export const deleteUserReaction = async (id_comment, id_user) => {
     }
 };
 
+export const deleteComment = async (id_comment) => {
+    try{
+        const query = 'DELETE FROM comments_users_posts WHERE id = $1 RETURNING 1';
+        const result = await pool.query(query, [id_comment]); 
+
+        if(result.rows.length > 0)
+            return true;
+        else
+            return null;
+    } catch(error) {
+        console.error("Error querying the database", error);
+        return null;
+    }
+};
+
 export default{
     getCommentsByPostId,
     createComment,
     getUserHasLiked,
     setUserReaction,
-    deleteUserReaction
+    deleteUserReaction,
+    deleteComment
 }

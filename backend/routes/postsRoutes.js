@@ -4,7 +4,8 @@ import { requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/getAllPosts', requireAuth, controller.getAllPosts);
+router.get('/getAllPosts', controller.getAllPosts);
+router.get('/getPostsByFilter/:order_filter/:post_filter/:current_user_id', controller.getPostsByFilter);
 router.get('/getPostById/:id', controller.getPostById);
 router.get('/getUserHasLiked/:id_post/:id_user', controller.getUserHasLiked);
 

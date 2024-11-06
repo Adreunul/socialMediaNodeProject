@@ -2,8 +2,17 @@ import Comment from '../models/commentModel.js';
 
 export const getCommentsByPostId = async (req, res) => {
     const id = req.params.id;
+    const orderFilter = req.params.order_filter;
+    const commentFilter = req.params.comment_filter;
+    const currentUserId = req.params.current_user_id;
+
+    var order_filter = "";
+        if(orderFilter === "mostRecent") 
+            order_filter = "comment_id";
+          else
+            order_filter = "likes";
     try{
-        var comments = await Comment.getCommentsByPostId(id);
+        var comments = await Comment.getCommentsByPostId(id, order_filter, commentFilter, currentUserId);
         if(comments !== null)
             comments = await formatReactionsNumber(comments);
         res.status(200).json({ status: 'success', comments : comments });
@@ -18,12 +27,10 @@ export const createComment = async (req, res) => {
 
     try{
         const response = await Comment.createComment(post_id, user_id, text);
-        console.log("response: " + response);
-        console.log("post_id: " + post_id + " user_id: " + user_id + " text: " + text);
-        if(response)
+        if(response && response !== "duplicate")
             return res.status(200).json({ status: 'success', message: 'Comment added' });
-        else
-            return res.status(500).json({ status: 'error', message: 'Failed to add comment' });
+        else if(response === "duplicate")
+            return res.status(500).json({ status: 'error', message: 'Duplicate comment for the same post.' });
     } catch (error) {
         console.error("Error creating comment", error);
         res.status(500).json({ status: 'error', message: 'Failed to add comment' });
@@ -78,6 +85,21 @@ export const deleteUserReaction = async (req, res) => {
     }
 };
 
+export const deleteComment = async (req, res) => {
+    const comment_id = req.params.comment_id;
+
+    try{
+        const response = await Comment.deleteComment(comment_id);
+        if(response)
+            return res.status(200).json({ status: 'success', message: 'Comment deleted' });
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to delete comment' });
+    } catch (error) {
+        console.error("Error deleting comment", error);
+        res.status(500).json({ status: 'error', message: 'Failed to delete comment' });
+    }
+};
+
 async function formatReactionsNumber(comments) {
     for(var i = 0; i < comments.length; i++) {
         console.log("reactions_number: "+comments[i].likes);
@@ -119,5 +141,6 @@ export default{
     createComment,
     getUserHasLiked,
     setUserReaction,
-    deleteUserReaction
+    deleteUserReaction,
+    deleteComment
 }
