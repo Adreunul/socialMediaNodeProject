@@ -23,20 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     profileButton.addEventListener('click', async () => {
         localStorage.setItem('userId', currentUserId);
         window.location.href = '/profile/' + currentUserId;
-        // try {
-        //     const response = await fetch('/api/v1/auth/session');
-        //     if (response.ok) {
-        //         const sessionData = await response.json();
-        //         const currentUserId = sessionData.userId;
-
-        //         localStorage.setItem('userId', currentUserId);
-        //         window.location.href = '/profile/' + currentUserId;
-        //     } else {
-        //         console.error('Failed to fetch session');
-        //     }
-        // } catch (error) {
-        //     console.error('Failed to fetch session', error);
-        // }
     });
 
     const logButton = document.getElementById('log-account-button');
