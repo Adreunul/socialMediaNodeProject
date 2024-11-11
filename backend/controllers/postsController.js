@@ -191,6 +191,22 @@ export const deleteUserReaction = async (req, res) => {
     }
 };
 
+export const markPostAsSeenByUser = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+
+    try{
+        const response = await Post.markPostAsSeenByUser(id_post, id_user);
+        if(response)
+            return res.status(200).json({ status: 'success', message: 'Post marked as seen' });
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to mark post as seen' });
+    } catch (error) {
+        console.error("Error marking post as seen", error);
+        res.status(500).json({ status: 'error', message: 'Failed to mark post as seen' });
+    }
+};
+
 function checkPost(title, content){  
     if(title.split(" ").length > 10 || title.length > 100)
         return "title";
@@ -245,5 +261,6 @@ export default {
     getUserHasLiked,
     setUserReaction,
     editUserReaction,
-    deleteUserReaction
+    deleteUserReaction,
+    markPostAsSeenByUser
 }

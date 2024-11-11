@@ -6,6 +6,7 @@ import pg from 'pg';
 import authRoutes from './routes/authRoutes.js';
 import postsRoutes from './routes/postsRoutes.js';
 import commentsRoutes from './routes/commentRoutes.js';
+import usersRoutes from './routes/userRoutes.js';
 import { requireAuth } from './middleware/authMiddleware.js';
 
 const __dirname = path.resolve();
@@ -25,10 +26,11 @@ app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false, maxAge: 60000 }
+    cookie: { secure: false, maxAge: 600000 }
     })
 );
 app.use('/api/v1/auth/', authRoutes);
+app.use('/api/v1/users/', usersRoutes);
 app.use('/api/v1/posts/', postsRoutes);
 app.use('/api/v1/comments/', commentsRoutes);
 
@@ -60,8 +62,8 @@ app.get("/comment-post/:id", requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'comment-post.html'));
 });
 
-app.get("/profile", requireAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+app.get("/profile/:user_id", requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'profile-page.html'));
 });
 
 app.listen(port, () => {

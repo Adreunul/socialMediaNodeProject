@@ -17,9 +17,12 @@ document.getElementById('loginForm').addEventListener('submit', async(event) => 
                 password
             })
         });
+        const data = await response.json();
 
-        if(response.ok)
+        if(response.ok){
+            localStorage.setItem('userId', data.userId);
             window.location.href = '/home';
+        }
         else 
             alert('Invalid email or password');
         

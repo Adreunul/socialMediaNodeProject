@@ -23,13 +23,14 @@ export const getPostsByFilter = async (orderFilter, postFilter, currentUserId) =
         'SELECT p.id post_id, p.title, p.text, p.date, p.id_author, p.edited, u.username, ' +
         '(SELECT COUNT(id) FROM likes_users_posts WHERE id_post = p.id) AS reactions_number, ' +
         '(SELECT FLOOR(((SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id AND likes = 1)::FLOAT / ' +
-        '(SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id)) * 100) AS agree_percentage) ' +
+        '(SELECT COUNT(id) + 1 FROM likes_users_posts WHERE id_post = p.id)) * 100) AS agree_percentage), ' +
+        '(SELECT COUNT(id) FROM seen_posts WHERE user_id = $1 AND post_id = p.id) AS user_has_seen ' +
         'FROM posts p JOIN users u ON p.id_author = u.id ' +
         (postFilter === "myPosts" ? 'WHERE p.id_author = $1 ' : '') +
         `ORDER BY ${orderFilter} DESC;`;
 
-        const result = await pool.query(query, postFilter === "myPosts" ? [currentUserId] : []);
-
+        //const result = await pool.query(query, postFilter === "myPosts" ? [currentUserId] : []);
+          const result = await pool.query(query, [currentUserId]);
 
         if (result.rows.length > 0) {
             console.log("result.rows: " + result.rows);
@@ -165,6 +166,21 @@ export const deleteUserReaction = async (id_post, id_user) => {
     }
 };
 
+export const markPostAsSeenByUser = async (id_post, id_user) => {
+    try{
+        const query = 'INSERT INTO seen_posts (post_id, user_id) VALUES ($1, $2) RETURNING 1';
+        const result = await pool.query(query, [id_post, id_user]);
+
+        if(result.rows.length > 0)
+            return true;
+        else
+            return null;
+    } catch (error) {
+        console.error("Error querying the database", error);
+        return null;
+    }
+};
+
 export default {
     getAllPosts,
     getPostsByFilter,
@@ -175,5 +191,6 @@ export default {
     getUserHasLiked,
     setUserReaction,
     editUserReaction,
-    deleteUserReaction
+    deleteUserReaction,
+    markPostAsSeenByUser
 }

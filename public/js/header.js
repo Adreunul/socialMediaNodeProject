@@ -1,18 +1,42 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    if(window.location.pathname !== '/login' && window.location.pathname !== '/register' && window.location.pathname !== '/') {
+        await getSessionAndUsername();
+    }
+
+    const currentUserId = await getCurrentSession();
+    console.log(currentUserId);
+
     const homeButton = document.getElementById('navbar-brand');
     homeButton.addEventListener('click', (event) => {
         event.preventDefault();
+        localStorage.setItem('userId', currentUserId);
         window.location.href = '/home';
     });
 
     const writePostButton = document.getElementById('write-a-post-button');
     writePostButton.addEventListener('click', () => {
+        localStorage.setItem('userId', currentUserId);
         window.location.href = '/write-post';
     });
 
     const profileButton = document.getElementById('go-to-profile-button');
-    profileButton.addEventListener('click', () => {
-        window.location.href = '/profile';
+    profileButton.addEventListener('click', async () => {
+        localStorage.setItem('userId', currentUserId);
+        window.location.href = '/profile/' + currentUserId;
+        // try {
+        //     const response = await fetch('/api/v1/auth/session');
+        //     if (response.ok) {
+        //         const sessionData = await response.json();
+        //         const currentUserId = sessionData.userId;
+
+        //         localStorage.setItem('userId', currentUserId);
+        //         window.location.href = '/profile/' + currentUserId;
+        //     } else {
+        //         console.error('Failed to fetch session');
+        //     }
+        // } catch (error) {
+        //     console.error('Failed to fetch session', error);
+        // }
     });
 
     const logButton = document.getElementById('log-account-button');
@@ -35,3 +59,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 });
+
+async function getCurrentSession() {
+    try {
+      const response = await fetch("/api/v1/auth/session");
+      if (response.ok) {
+        const sessionData = await response.json();
+        return sessionData.userId;
+        //localStorage.setItem("currentUserId", currentUserId);
+      } else {
+        console.error("Failed to fetch session");
+        return;
+      }
+    } catch (error) {
+      console.error("Failed to fetch session", error);
+    }
+  }
+
+async function getSessionAndUsername() {
+    try {
+        const response = await fetch('/api/v1/auth/session');
+        if (response.ok) {
+            const sessionData = await response.json();
+            const currentUserId = sessionData.userId;
+            setUsername(currentUserId);
+        } else {
+            console.error('Failed to fetch session');
+        }
+    } catch (error) {
+        console.error('Failed to fetch session', error);
+    }
+
+}
+
+async function setUsername(currentUserId)
+{
+    try{
+        const response = await fetch('/api/v1/users/getUsernameById/' + currentUserId);
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+            const username = data.username;
+            const usernameElement = document.getElementById('go-to-profile-button');
+            usernameElement.innerText = username;
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Failed to fetch username', error);
+    }
+}
+

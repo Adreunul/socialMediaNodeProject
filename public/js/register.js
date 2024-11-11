@@ -32,6 +32,7 @@ form.addEventListener('submit', async (event) => {
         const data = await response.json();
 
         if (response.ok && data.status === 'success') {
+            localStorage.setItem('userId', data.userId);
             window.location.href = '/home';
         } else {
             alert(data.message); // Now we show the custom error message from the backend

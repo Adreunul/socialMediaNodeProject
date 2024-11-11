@@ -1,18 +1,42 @@
 import "./header.js";
-
-let currentUserId = null;
 let orderingFilter = "mostRecent";
 let postsFilter = "allPosts";
 
+var userId = null;
+
+//const url = window.location.href;
+//const userId = url.split("/").pop();
+
 const postsContainer = document.getElementById("posts-container");
+const filterMostRecentButton = document.getElementById("most-recent-filter-button");
+const filterMostPopularButton = document.getElementById("most-popular-filter-button");
+const dropdownMenu = document.getElementById("dropdown-menu");
+const allPostsButton = document.getElementById("all-posts-filter-button");
+const myPostsButton = document.getElementById("my-posts-filter-button");
 
+ 
 document.addEventListener("DOMContentLoaded", async () => {
+  const currentUserId = await getCurrentSession()
+  userId = localStorage.getItem("userId");
+  console.log("current user id: " + currentUserId);
+  console.log("user id: " + userId);
 
+  if(currentUserId != userId && userId != null) {
+    postsFilter = "myPosts";
+    dropdownMenu.innerText = localStorage.getItem("username") + "'s Posts";
+  } else if(userId == null)
+    userId = currentUserId;
+
+  requestPosts();
+});
+
+async function getCurrentSession() {
   try {
     const response = await fetch("/api/v1/auth/session");
     if (response.ok) {
       const sessionData = await response.json();
-      currentUserId = sessionData.userId;
+      return sessionData.userId;
+      //localStorage.setItem("currentUserId", currentUserId);
     } else {
       console.error("Failed to fetch session");
       return;
@@ -20,31 +44,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("Failed to fetch session", error);
   }
+}
 
-  // try {
-  //   const response = await fetch("/api/v1/posts/getAllPosts");
-  //   if (response.ok) {
-  //     const posts = await response.json();
-  //     console.log(posts);
-  //     displayPosts(posts, postsContainer);
-  //   } else {
-  //     console.error("Failed to fetch posts");
-  //     postsContainer.innerHTML = "<p>No posts available</p>";
-  //   }
-  // } catch (error) {
-  //   console.error("Failed to fetch posts", error);
-  //   postsContainer.innerHTML =
-  //     "<p>Error loading posts. Please try again later.</p>";
-  // }
+const currentUserId = await getCurrentSession();
 
-  requestPosts();
-});
-
-const filterMostRecentButton = document.getElementById("most-recent-filter-button");
-const filterMostPopularButton = document.getElementById("most-popular-filter-button");
-const dropdownMenu = document.getElementById("dropdown-menu");
-const allPostsButton = document.getElementById("all-posts-filter-button");
-const myPostsButton = document.getElementById("my-posts-filter-button");
 
 filterMostRecentButton.addEventListener("click", async (event) => {
   if(orderingFilter !== "mostRecent") {
@@ -60,6 +63,7 @@ filterMostPopularButton.addEventListener("click", async (event) => {
       filterMostPopularButton.classList.toggle("filtering-button-pressed");
       filterMostRecentButton.classList.toggle("filtering-button-pressed");
       orderingFilter = "mostPopular";
+
       requestPosts();
     }
 });
@@ -68,6 +72,7 @@ allPostsButton.addEventListener("click", async (event) => {
   if(postsFilter !== "allPosts") {
     dropdownMenu.innerText = "All Posts";
     postsFilter = "allPosts";
+    localStorage.setItem("userId", currentUserId);
     requestPosts();
   }
 });
@@ -76,18 +81,24 @@ myPostsButton.addEventListener("click", async (event) => {
   if(postsFilter !== "myPosts") {
     dropdownMenu.innerText = "My Posts";
     postsFilter = "myPosts";
+    localStorage.setItem("userId", currentUserId);
     requestPosts();
   }
 });
 
 async function requestPosts() {
+  userId = localStorage.getItem("userId");
+  console.log("user id: " + userId + " current user id: " + currentUserId);
   try {    
-    const response = await fetch(`/api/v1/posts/getPostsByFilter/${orderingFilter}/${postsFilter}/${currentUserId}`);
+    console.log("ordering filter: " + orderingFilter + " posts filter: " + postsFilter + " current user id: " + currentUserId);
+    const response = await fetch(`/api/v1/posts/getPostsByFilter/${orderingFilter}/${postsFilter}/${userId}`);
     if (response.ok) {
       const posts = await response.json();
+      
       displayPosts(posts);
     } else {
       console.error("Failed to fetch posts");
+      displayNoPostsAvailable();
       return null;
     }
   } catch (error) {
@@ -99,14 +110,79 @@ async function requestPosts() {
 async function displayPosts(posts) {
   postsContainer.innerHTML = "";
 
+  // Function to check if a post is no longer visible in the viewport
+  function checkIfPostLeftViewport(postCard) {
+    const rect = postCard.getBoundingClientRect();
+    return rect.top + rect.height <= 0; // Checks if the post is completely above the viewport
+  }
+
+  // Handle scroll events to check post visibility
+  function handleScroll() {
+    if(userId != currentUserId){
+      return;
+    }
+    const postCards = document.querySelectorAll(".card");
+    postCards.forEach(postCard => {
+      // Check if the post card is above the viewport (out of view)
+      if (checkIfPostLeftViewport(postCard) && !postCard.classList.contains("seen-post")) {
+        const postId = postCard.dataset.postId;
+        postCard.classList.add("seen-post");
+        postCard.classList.remove("unseen-post");
+        
+        markPostAsSeenByUser(postId);
+
+        console.log(`Post ${postId} is no longer in view and marked as seen.`);
+      }
+    });
+
+    // Check if user has scrolled to the last 5% of the page
+    const scrollPosition = window.scrollY + window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    if (scrollPosition / documentHeight > 0.95) {
+      console.log("yoyoyo");
+      // If the user has scrolled near the bottom, trigger visibility check for remaining posts
+      const remainingPosts = document.querySelectorAll(".unseen-post");
+      remainingPosts.forEach(postCard => {
+        console.log("jagajaga");
+        // Check if post is visible and mark it as seen
+        if (!checkIfPostLeftViewport(postCard)) {
+          const postId = postCard.dataset.postId;
+          postCard.classList.add("seen-post");
+          postCard.classList.remove("unseen-post");
+          markPostAsSeenByUser(postId);
+          console.log(`Post ${postId} marked as seen because the user scrolled near the bottom.`);
+        }
+      });
+    }
+  }
+
+  // Add scroll listener
+  if(userId == currentUserId)
+    window.addEventListener("scroll", handleScroll);
+
   for (let i = 0; i < posts.length; i++) {
     const post = posts[i];
     const postCard = document.createElement("div");
     postCard.className = "card";
     postCard.style.width = "35rem";
     postCard.style.minWidth = "300px";
+
+    postCard.dataset.postId = post.post_id;
+
     console.log("post user ID: " + post.id_author);
     console.log("current user ID: " + currentUserId);
+    console.log("user has seen " + posts[i].user_has_seen);
+
+    if(currentUserId == userId) {
+      if(posts[i].user_has_seen == 1) {
+        postCard.classList.add("seen-post");
+      }
+      else {
+        postCard.classList.add("unseen-post");
+      }
+    }
+
+    //posts[i].user_has_seen === 1 ?  postCard.classList.add("seen-post") : postCard.classList.add("unseen-post");
 
     var userHasLiked = false;
     var userHasDisliked = false;
@@ -170,9 +246,11 @@ async function displayPosts(posts) {
                 </div>
 
                 <div class="author-info" style="display: flex; flex-direction: column; align-items: center;">
-                <h6 class="author" style="text-align: center;">
-                    Written by: ${post.username}
-                </h6>
+                    <h6 class="author-label" style="text-align: center;">Written by:
+                    <div class="author"> 
+                      ${post.username}
+                    </div>
+                    </h6>
                 <div class="author-buttons" style="margin-bottom: 10px !important;">
                     <a href="#" class="edit-post card-link ${post.id_author === currentUserId ? "" : "invisible"}">Edit</a>
                     <a href="#" class="delete-post card-link ${post.id_author === currentUserId ? "" : "invisible"}">Delete</a>
@@ -199,7 +277,15 @@ async function displayPosts(posts) {
     const dislikeButton = postCard.querySelector(".dislike-button");
     const commentButton = postCard.querySelector(".comment-button");
 
+    const author = postCard.querySelector(".author");
+
     if (post.id_author !== currentUserId) {
+        author.classList.add("author-clickable");
+        author.addEventListener("click", async (event) => {
+            event.preventDefault();
+            window.location.href = `/profile/${post.id_author}`;
+        });
+
         likeButton.addEventListener("click", async (event) => {
             likeButton.classList.toggle("post-like-button-pressed");
 
@@ -254,6 +340,15 @@ async function displayPosts(posts) {
     postsContainer.appendChild(postCard);
 }
 
+  handleScroll();
+}
+
+function displayNoPostsAvailable() {
+  postsContainer.innerHTML = `
+    <div class="no-posts-container">
+        <h5 class="no-posts-text">No posts available</h5>
+    </div>
+`;
 }
 
 async function handleDeletePost(post, postCard, userHasLiked, userHasDisliked) {
@@ -507,6 +602,19 @@ async function deleteUserReaction(postId, userId) {
   }
 }
 
+async function markPostAsSeenByUser(postId) {
+  try{
+    const response = await fetch('/api/v1/posts/markPostAsSeenByUser/' + postId + '/' + currentUserId, {
+      method: "POST",
+    });
+    if(!response.ok) {
+      console.error("Failed to mark post as seen by user " + response.message);
+    }
+  } catch (error) {
+    console.error("Failed to mark post as seen by user", error);
+  }
+}
+
 function formatPostDate(post) {
   const postDate = new Date(post.date);
   const now = new Date();
@@ -564,3 +672,9 @@ function formatPostHour(post) {
 
   return time;
 }
+
+window.addEventListener('beforeunload', () => {
+  if (seenPostIds.size > 0) {
+      
+  }
+});

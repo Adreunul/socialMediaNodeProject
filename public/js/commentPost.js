@@ -162,8 +162,10 @@ async function displayPost(post) {
                 </div>
 
                 <div class="author-info" style="display: flex; flex-direction: column; align-items: center;">
-                    <h6 class="author" style="text-align: center;">
-                        Written by: ${post.username}
+                    <h6 class="author-label" style="text-align: center;">Written by:
+                    <div class="author"> 
+                        ${post.username}
+                    </div>
                     </h6>
                     <p class="${post.edited === 1 ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 0px !important; margin-top: 5px !important;">
                         Edited
@@ -208,6 +210,8 @@ async function displayPost(post) {
     const likeButton = postCard.querySelector(".like-button");
     const dislikeButton = postCard.querySelector(".dislike-button");
 
+    const author = postCard.querySelector(".author");
+
     const dropdownOrderFilter = postCard.querySelector(".comment-filter-order");
     const dropdownCommentFilter = postCard.querySelector(".comment-filter-comments");
 
@@ -249,6 +253,12 @@ async function displayPost(post) {
     });
 
     if (post.id_author !== currentUserId) {
+        author.classList.add("author-clickable");
+        author.addEventListener("click", async (event) => {
+            event.preventDefault();
+            window.location.href = `/profile/${post.id_author}`;
+        });
+        
         likeButton.addEventListener("click", async (event) => {
             likeButton.classList.toggle("post-like-button-pressed");
 
@@ -324,9 +334,9 @@ async function displayComments(comments) {
         </p>
         <hr class="content-underline" style="margin-bottom:5px !important;">
         <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-            <h6 class="author" style="text-align: center;">
+            <div class="author" style="text-align: center;">
                 ${comment.username}
-            </h6>
+            </div>
 
             <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
                 &#x21e7
@@ -508,9 +518,9 @@ async function handleDeletePost(comment, commentCard, userHasLiked) {
         </p>
         <hr class="content-underline" style="margin-bottom:5px !important;">
         <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-            <h6 class="author" style="text-align: center;">
+            <div class="author author-clickable" style="text-align: center;">
                 ${comment.username}
-            </h6>
+            </div>
 
             <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
                 &#x21e7
