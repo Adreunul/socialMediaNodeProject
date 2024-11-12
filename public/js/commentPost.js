@@ -1,6 +1,7 @@
 import "./header.js";
 
 let currentUserId = null;
+let authorName = null;
 let postId = null;
 let orderingFilter = "mostRecent";
 let commentFilter = "allComments";
@@ -24,27 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await requestPostsById();
-
-    // try{
-    //     const response = await fetch('/api/v1/posts/getPostById/' + postId);
-    //     if(response.ok) {
-    //         const data = await response.json();
-    //         console.log(data);
-    //         await displayPost(data[0]);
-    //         try{
-    //             const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
-    //             if(response.ok) {
-    //                 const data = await response.json();
-    //                 console.log(data);
-    //                 await displayComments(data.comments);
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to fetch comments', error);
-    //         }
-    //     }
-    // } catch(error) {
-    //     console.error('Failed to fetch post', error);
-    // }
 });
 
 async function requestPostsById() {
@@ -55,17 +35,8 @@ async function requestPostsById() {
             console.log(data);
             await displayPost(data[0]);
             
+            authorName = data[0].username;
             requestCommentsByPostId();
-            // try{
-            //     const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId);
-            //     if(response.ok) {
-            //         const data = await response.json();
-            //         console.log(data);
-            //         await displayComments(data.comments);
-            //     }
-            // } catch (error) {
-            //     console.error('Failed to fetch comments', error);
-            // }
         }
     } catch(error) {
         console.error('Failed to fetch post', error);
@@ -74,11 +45,10 @@ async function requestPostsById() {
 
 async function requestCommentsByPostId() {
     try{
-        console.log("orderingFilter: " + orderingFilter + " commentFilter: " + commentFilter + " currentUserId: " + currentUserId + " postId: " + postId);
+        console.log("post id: " + postId + " ordering filter: " + orderingFilter + " comment filter: " + commentFilter + " current user id: " + currentUserId);
         const response = await fetch('/api/v1/comments/getCommentsByPostId/' + postId + '/' + orderingFilter + '/' + commentFilter + '/' + currentUserId);
         if(response.ok) {
             const data = await response.json();
-            console.log(data);
             await displayComments(data.comments);
         }
     } catch (error) {
@@ -96,8 +66,13 @@ async function displayPost(post) {
     console.log("post user ID: " + post.id_author);
     console.log("current user ID: " + currentUserId);
 
+    authorName = post.username;
+
     var userHasLiked = false;
     var userHasDisliked = false;
+
+
+
     if (post.id_author === currentUserId) {
         userHasLiked = true;
         userHasDisliked = false;
@@ -182,8 +157,8 @@ async function displayPost(post) {
                         Most Recent
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" id="most-recent-filter-button" href="#">Most Recent</a></li>
-                        <li><a class="dropdown-item" id="most-popular-filter-button" href="#">Most Popular</a></li>
+                        <li><a class="dropdown-item" id="most-recent-filter-button">Most Recent</a></li>
+                        <li><a class="dropdown-item" id="most-popular-filter-button">Most Popular</a></li>
                     </ul>
                 </div>    
 
@@ -192,8 +167,8 @@ async function displayPost(post) {
                         All Comments
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" id="all-comments-filter-button" href="#">All Comments</a></li>
-                        <li><a class="dropdown-item" id="my-comments-filter-button" href="#">My Comments</a></li>
+                        <li><a class="dropdown-item" id="all-comments-filter-button">All Comments</a></li>
+                        <li><a class="dropdown-item" id="my-comments-filter-button">My Comments</a></li>
                     </ul>
                 </div>
             </div>
@@ -335,7 +310,7 @@ async function displayComments(comments) {
         <hr class="content-underline" style="margin-bottom:5px !important;">
         <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
             <div class="author" style="text-align: center;">
-                ${comment.username}
+                ${comment.username} ${comment.username == authorName ? "[author]" : ((comment.agrees == null ? "" : (comment.agrees == 1 ? "agrees" : "disagrees"))) }
             </div>
 
             <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
@@ -393,7 +368,7 @@ async function displayComments(comments) {
         commentCard.innerHTML = `
         <div class="card-body" style="background-color: #ff9854bd;padding-bottom:0px !important;">
         <p class="text card-text">
-            No comments have been posted yet.
+            No comments have been written yet.
         </p>
         <hr class="content-underline" style="margin-bottom:5px !important;">
         </div>
@@ -479,8 +454,8 @@ async function handleDeletePost(comment, commentCard, userHasLiked) {
         <div class="card-body" style="height:${initialCardHeight}px !important; display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#ff985499;">
         <h6 class="confirmation-text" style="text-align:center">Do you want to delete this Comment ?</h6>
         <div class="author-buttons">
-            <a href="#" class="confirm-delete card-link">Delete my Comment</a>
-            <a href="#" class="stop-delete card-link">Cancel</a>
+            <a class="confirm-delete card-link">Delete my Comment</a>
+            <a class="stop-delete card-link">Cancel</a>
         </div>
     </div>
     `;

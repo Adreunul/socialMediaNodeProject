@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const currentUserId = await getCurrentSession();
-    console.log(currentUserId);
 
     const homeButton = document.getElementById('navbar-brand');
     homeButton.addEventListener('click', (event) => {

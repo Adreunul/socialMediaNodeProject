@@ -44,8 +44,10 @@ export const updateUsername = async (req, res) => {
 
     try{
         const result = await User.updateUsername(id, username);
-        if(result)
+        if(result) {
+            console.log("Username updated for user: " + id);
             return res.status(200).json({ status: 'success', message: 'Username updated' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to update username' });
     } catch (error) {
@@ -70,8 +72,10 @@ export const updateBio = async (req, res) => {
     
         else if(check == 1) {
             const result = await User.updateBio(id, bio);
-            if(result)
+            if(result) {
+                console.log("Bio updated for user: " + id);
                 return res.status(200).json({ status: 'success', message: 'Bio updated' });
+            }
             else
                 return res.status(500).json({ status: 'error', message: 'Failed to update bio' });
         }

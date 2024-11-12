@@ -17,6 +17,7 @@ export const login = async (req, res) => {
 
         if (passwordMatch) {
             req.session.userId = user.id;
+            console.log('User logged in:', user.id);
             return res.status(200).json({ userId: user.id, message: 'Login successful' });
         } else {
             return res.status(401).send('Invalid email or password');
@@ -34,7 +35,7 @@ export const logout = (req, res) => {
         if (err) {
             return res.status(500).send('Failed to log out');
         }
-        res.clearCookie('connect.sid'); // Assuming you're using connect.sid as the session cookie
+        res.clearCookie('connect.sid');
         res.status(200).send('Logout successful');
     });
 };
@@ -65,6 +66,7 @@ export const register = async (req, res) => {
 
         if (response && typeof response === 'number') {
             req.session.userId = response;
+            console.log('User registered:', response);
             return res.status(201).json({ status: 'success', message: 'User created', userId: response });
         } else if (response === 'email') {
             return res.status(400).json({ status: 'error', message: 'Email already in use', field: 'email' });
@@ -101,6 +103,7 @@ export const updatePassword = async (req, res) => {
         const hashedNewPassword = await bcrypt.hash(new_password, 10);
         const response = await User.updatePassword(user_id, hashedNewPassword);
         if(response){
+            console.log('Password updated for user:', user_id);
             return res.status(200).json({status: 'success', message: 'Password updated'});
         }
         else{

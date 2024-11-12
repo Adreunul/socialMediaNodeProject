@@ -97,6 +97,10 @@ body{
     --bs-btn-active-bg:#ff6600 !important;
 }
 
+.dropdown-item{
+    cursor:pointer;
+}
+
 .filtering-button-pressed{
     background-color:#ff6600 !important;
     color: black;

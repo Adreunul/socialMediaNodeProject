@@ -55,7 +55,6 @@ export const writeNewPost = async (req, res) => {
     }
 
     var check = await checkPost(title, text);
-    console.log("check: "+check);
     if(check == "title")
         return res.status(400).json({ status: 'error', message: 'Title is too long (maximum 10 words)', field: 'title' });
     else if(check == "text")
@@ -73,8 +72,10 @@ export const writeNewPost = async (req, res) => {
 
         const response = await Post.createPost(title, text, currentTime, id_author);
         console.log("response: "+response);
-        if(response && typeof response === 'number')
+        if(response && typeof response === 'number') {
+            console.log("Post created by user: " + id_author);
             return res.status(201).json({ status: 'success', message: 'Post created' });
+        }
         else if(response === 'title')
             return res.status(400).json({ status: 'error', message: 'This title has already been used', field: 'title' });
         else
@@ -97,8 +98,10 @@ export const editPost = async (req, res) => {
 
     try {
         const response = await Post.updatePost(id, text);
-        if(response)
+        if(response) {
+            console.log("Post updated : " + id);
             return res.status(200).json({ status: 'success', message: 'Post updated' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to update post' });
     } catch (error) {
@@ -109,12 +112,13 @@ export const editPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
     const id = req.params.id;
-    console.log("id: "+id);
 
     try {
         const response = await Post.deletePost(id);
-        if(response)
+        if(response) {
+            console.log("Post deleted: " + id);
             return res.status(200).json({ status: 'success', message: 'Post deleted' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to delete post' });
     } catch (error) {
@@ -141,14 +145,12 @@ export const setUserReaction = async (req, res) => {
     const id_user = req.params.id_user;
     const likes = req.params.likes;
 
-    console.log("id_post: "+id_post);
-    console.log("id_user: "+id_user);
-    console.log("likes: "+likes);
-
     try{
         const response = await Post.setUserReaction(id_post, id_user, likes);
-        if(response)
+        if(response) {
+            console.log("User reaction added by user: " + id_user + " at post: " + id_post);
             return res.status(200).json({ status: 'success', message: 'User reaction added' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to add user reaction' });
     } catch (error) {
@@ -165,8 +167,10 @@ export const editUserReaction = async (req, res) => {
 
     try {
         const response = await Post.editUserReaction(id_post, id_user, likes);
-        if(response)
+        if(response) {
+            console.log("User reaction updated by user: " + id_user + " at post: " + id_post);
             return res.status(200).json({ status: 'success', message: 'User reaction updated' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to update user reaction' });
     } catch (error) {
@@ -181,8 +185,10 @@ export const deleteUserReaction = async (req, res) => {
 
     try {
         const response = await Post.deleteUserReaction(id_post, id_user);
-        if(response)
+        if(response) {
+            console.log("User reaction deleted by user: " + id_user + " at post: " + id_post);
             return res.status(200).json({ status: 'success', message: 'User reaction deleted' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to delete user reaction' });
     } catch (error) {
@@ -197,8 +203,10 @@ export const markPostAsSeenByUser = async (req, res) => {
 
     try{
         const response = await Post.markPostAsSeenByUser(id_post, id_user);
-        if(response)
+        if(response){
+            console.log("Post " + id_post + " marked as seen by user: " + id_user);
             return res.status(200).json({ status: 'success', message: 'Post marked as seen' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to mark post as seen' });
     } catch (error) {

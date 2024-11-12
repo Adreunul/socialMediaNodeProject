@@ -18,8 +18,6 @@ const myPostsButton = document.getElementById("my-posts-filter-button");
 document.addEventListener("DOMContentLoaded", async () => {
   const currentUserId = await getCurrentSession()
   userId = localStorage.getItem("userId");
-  console.log("current user id: " + currentUserId);
-  console.log("user id: " + userId);
 
   if(currentUserId != userId && userId != null) {
     postsFilter = "myPosts";
@@ -78,7 +76,7 @@ allPostsButton.addEventListener("click", async (event) => {
 });
 
 myPostsButton.addEventListener("click", async (event) => {
-  if(postsFilter !== "myPosts") {
+  if(postsFilter !== "myPosts" || postsFilter === "myPosts" && userId != currentUserId) {
     dropdownMenu.innerText = "My Posts";
     postsFilter = "myPosts";
     localStorage.setItem("userId", currentUserId);
@@ -88,9 +86,7 @@ myPostsButton.addEventListener("click", async (event) => {
 
 async function requestPosts() {
   userId = localStorage.getItem("userId");
-  console.log("user id: " + userId + " current user id: " + currentUserId);
   try {    
-    console.log("ordering filter: " + orderingFilter + " posts filter: " + postsFilter + " current user id: " + currentUserId);
     const response = await fetch(`/api/v1/posts/getPostsByFilter/${orderingFilter}/${postsFilter}/${userId}`);
     if (response.ok) {
       const posts = await response.json();
@@ -130,8 +126,6 @@ async function displayPosts(posts) {
         postCard.classList.remove("unseen-post");
         
         markPostAsSeenByUser(postId);
-
-        console.log(`Post ${postId} is no longer in view and marked as seen.`);
       }
     });
 
@@ -139,18 +133,15 @@ async function displayPosts(posts) {
     const scrollPosition = window.scrollY + window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     if (scrollPosition / documentHeight > 0.95) {
-      console.log("yoyoyo");
       // If the user has scrolled near the bottom, trigger visibility check for remaining posts
       const remainingPosts = document.querySelectorAll(".unseen-post");
       remainingPosts.forEach(postCard => {
-        console.log("jagajaga");
         // Check if post is visible and mark it as seen
         if (!checkIfPostLeftViewport(postCard)) {
           const postId = postCard.dataset.postId;
           postCard.classList.add("seen-post");
           postCard.classList.remove("unseen-post");
           markPostAsSeenByUser(postId);
-          console.log(`Post ${postId} marked as seen because the user scrolled near the bottom.`);
         }
       });
     }
@@ -168,10 +159,6 @@ async function displayPosts(posts) {
     postCard.style.minWidth = "300px";
 
     postCard.dataset.postId = post.post_id;
-
-    console.log("post user ID: " + post.id_author);
-    console.log("current user ID: " + currentUserId);
-    console.log("user has seen " + posts[i].user_has_seen);
 
     if(currentUserId == userId) {
       if(posts[i].user_has_seen == 1) {
@@ -287,6 +274,11 @@ async function displayPosts(posts) {
         });
 
         likeButton.addEventListener("click", async (event) => {
+            if(!postCard.classList.contains("seen-post")) { //mark post seen, seems more logical
+            postCard.classList.add("seen-post");
+            postCard.classList.remove("unseen-post");
+            markPostAsSeenByUser(post.post_id);
+            }
             likeButton.classList.toggle("post-like-button-pressed");
 
             if (dislikeButton.classList.contains("post-dislike-button-pressed")){
@@ -303,6 +295,11 @@ async function displayPosts(posts) {
         });
 
         dislikeButton.addEventListener("click", async (event) => {
+          if(!postCard.classList.contains("seen-post")) { //mark post seen, seems more logical
+            postCard.classList.add("seen-post");
+            postCard.classList.remove("unseen-post");
+            markPostAsSeenByUser(post.post_id);
+            }
             dislikeButton.classList.toggle("post-dislike-button-pressed");
 
             if (likeButton.classList.contains("post-like-button-pressed")){
@@ -323,6 +320,11 @@ async function displayPosts(posts) {
 
     commentButton.addEventListener("click", (event) => {
         event.preventDefault();
+        if(!postCard.classList.contains("seen-post")) { //mark post seen, seems more logical
+          postCard.classList.add("seen-post");
+          postCard.classList.remove("unseen-post");
+          markPostAsSeenByUser(post.post_id);
+          }
         handleCommentPost(post);
     });
 
@@ -521,19 +523,15 @@ async function handleDeletePost(post, postCard, userHasLiked, userHasDisliked) {
 }
 
 async function handleEditPost(post) {
-  console.log("edit post:" + post.post_id) ;
   window.location.href = `/edit-post/${post.post_id}`;
 }
 
 async function handleCommentPost(post) {
-  console.log("comment post:" + post.post_id) ;
   window.location.href = `/comment-post/${post.post_id}`;
 }
 
 async function getUserHasLiked(postId) {
   try {
-    console.log("eu asa trimit post id: " + postId);
-    console.log("eu asa trimit user id: " + currentUserId);
     const response = await fetch('/api/v1/posts/getUserHasLiked/' + postId + '/' + currentUserId);
 
     const data = await response.json();

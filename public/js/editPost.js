@@ -15,10 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
             const data = await response.json();
             const post = data[0];
-            console.log(data);
     
             if(response.ok){
-                console.log("title: "+post.title + " text: "+post.text);
                 titleField.value = post.title;
                 textField.value = post.text;
             }

@@ -2,7 +2,7 @@ import pool from '../db.js';
 
 export const getCommentsByPostId = async (id, orderFilter, commentFilter, currentUserId) => {
     try{
-        const query = 'SELECT c.id comment_id, c.text, u.username, u.id user_id, (SELECT COUNT(id) AS likes FROM likes_users_comments WHERE id_comment = c.id) AS likes FROM comments_users_posts c JOIN users u ON c.id_user = u.id WHERE c.id_post = $1 ' + (commentFilter === "myComments" ? 'AND u.id = $2 ' : '') + ' ORDER BY ' + orderFilter + ' DESC;';
+        const query = 'SELECT c.id comment_id, c.text, u.username, u.id user_id, (SELECT COUNT(id) AS likes FROM likes_users_comments WHERE id_comment = c.id) AS likes, (SELECT likes AS agrees FROM likes_users_posts WHERE id_user = u.id AND id_post = $1) AS agrees FROM comments_users_posts c JOIN users u ON c.id_user = u.id WHERE c.id_post = $1 ' + (commentFilter === "myComments" ? 'AND u.id = $2 ' : '') + ' ORDER BY ' + orderFilter + ' DESC;';
         const result = await pool.query(query, commentFilter === "myComments" ? [id, currentUserId] : [id]);
 
         if (result.rows.length > 0)

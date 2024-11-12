@@ -140,7 +140,6 @@ async function updateBio(newBio) {
 
 seePostsButton.addEventListener('click', async (event) => {
     event.preventDefault();
-    console.log("userId: " + userId);
     localStorage.setItem('userId', userId);
     localStorage.setItem('username', username);
     window.location.href = `/home`;

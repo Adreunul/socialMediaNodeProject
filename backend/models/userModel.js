@@ -55,8 +55,6 @@ export const updatePassword = async (id_user, password, actualPassword) => {
         const query = 'UPDATE users SET password = $1 WHERE id = $2 RETURNING 1';
         const result = await pool.query(query, [password, id_user]);
 
-        console.log(result.rows.length);
-
         if(result.rows.length > 0)
             return true;
         else
@@ -116,18 +114,13 @@ export const updateUsername = async (id_user, username) => {
 
 export const updateBio = async (id_user, bio) => {
     try{
-        console.log("yoyo");
         const query = 'UPDATE users SET bio = $1 WHERE id = $2 RETURNING 1';
         const result = await pool.query(query, [bio, id_user]);
 
-        if(result.rows.length > 0) {
-            console.log("merge")
+        if(result.rows.length > 0) 
             return true;
-        }
-        else{
-            console.log("nu merge");
+        else
             return null;
-        }
     } catch (error) {
         console.error("Error querying the database", error);
         return null;

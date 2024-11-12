@@ -18,7 +18,6 @@ export const getAllPosts = async (req, res) => {
 
 export const getPostsByFilter = async (orderFilter, postFilter, currentUserId) => {
     try{
-        console.log("orderFilter: " + orderFilter);
         const query = 
         'SELECT p.id post_id, p.title, p.text, p.date, p.id_author, p.edited, u.username, ' +
         '(SELECT COUNT(id) FROM likes_users_posts WHERE id_post = p.id) AS reactions_number, ' +
@@ -32,13 +31,10 @@ export const getPostsByFilter = async (orderFilter, postFilter, currentUserId) =
         //const result = await pool.query(query, postFilter === "myPosts" ? [currentUserId] : []);
           const result = await pool.query(query, [currentUserId]);
 
-        if (result.rows.length > 0) {
-            console.log("result.rows: " + result.rows);
+        if (result.rows.length > 0) 
             return result.rows;
-        } else {
-            console.log("caca maca");
+        else 
             return null;
-        }
     } catch (error){
         console.error("Error querying the database", error);
         throw error;
@@ -65,7 +61,6 @@ export const createPost = async (title, text, date, id_author) => {
     try{
         const query = 'INSERT INTO posts (title, text, date, id_author) VALUES ($1, $2, $3, $4) RETURNING id';
         const result = await pool.query(query, [title, text, date, id_author]);
-        console.log("id: " + result.rows[0].id);
 
         return result.rows[0].id;
     } catch (error) {

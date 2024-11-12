@@ -27,8 +27,10 @@ export const createComment = async (req, res) => {
 
     try{
         const response = await Comment.createComment(post_id, user_id, text);
-        if(response && response !== "duplicate")
+        if(response && response !== "duplicate") {
+            console.log("Comment added by user: " + user_id + " at post: " + post_id);
             return res.status(200).json({ status: 'success', message: 'Comment added' });
+        }
         else if(response === "duplicate")
             return res.status(500).json({ status: 'error', message: 'Duplicate comment for the same post.' });
     } catch (error) {
@@ -59,8 +61,10 @@ export const setUserReaction = async (req, res) => {
 
     try{
         const response = await Comment.setUserReaction(comment_id, user_id);
-        if(response)
+        if(response) {
+            console.log("User reaction added by user: " + user_id + " at comment: " + comment_id);
             return res.status(200).json({ status: 'success', message: 'User reaction added' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to add user reaction' });
     } catch (error) {
@@ -75,8 +79,10 @@ export const deleteUserReaction = async (req, res) => {
 
     try{
         const response = await Comment.deleteUserReaction(comment_id, user_id);
-        if(response)
+        if(response) {
+            console.log("User reaction deleted by user: " + user_id + " at comment: " + comment_id);
             return res.status(200).json({ status: 'success', message: 'User reaction deleted' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to delete user reaction' });
     }  catch (error) {
@@ -90,8 +96,10 @@ export const deleteComment = async (req, res) => {
 
     try{
         const response = await Comment.deleteComment(comment_id);
-        if(response)
+        if(response) {
+            console.log("Comment deleted: " + comment_id);
             return res.status(200).json({ status: 'success', message: 'Comment deleted' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to delete comment' });
     } catch (error) {
