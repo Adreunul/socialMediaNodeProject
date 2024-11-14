@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`/api/v1/posts/getPostById/${id}`);
     
             const data = await response.json();
-            console.log(data);
+            const post = data[0];
     
             if(response.ok){
-                titleField.value = data.title;
-                textField.value = data.text;
+                titleField.value = post.title;
+                textField.value = post.text;
             }
             else {
                 alert(data.message);

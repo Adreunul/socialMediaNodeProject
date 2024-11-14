@@ -1,3 +1,13 @@
+
+
+:root {
+    --bs-btn-hover-border-color: rgba(255, 102, 0, 1) !important;
+}
+
+.btn-primary{
+    --bs-btn-hover-border-color: rgba(255, 102, 0, 1) !important;
+}
+
 .form-control:focus {
     border-color: rgb(255, 125, 41) !important; /* Orange border */
     box-shadow: 0 0 0 0.25rem rgba(255, 125, 41, 0.25); /* Orange focus ring */
@@ -32,8 +42,21 @@ body{
     background-color: rgb(255, 125, 41) !important;
 }
 
+.nav-link{
+    border-radius:25%;
+    width:fit-content;
+}
+
+.nav-link:hover{
+    background-color: rgba(253, 101, 0, 0.616) !important;
+}
+
+.nav-link:hover::after{
+    
+}
+
 .navbar-brand{
-    background-color: rgb(255, 102, 0) !important;
+    background-color: #ff6600 !important;
     padding:10px !important;
     border: 2px solid black;
     border-radius:5%;
@@ -45,7 +68,51 @@ body{
     height:100vh;
 }
 
+.filtering-buttons-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.filtering-button {
+    margin-right: 10px;
+    margin-left: 10px;
+    padding: 0 1rem; /* Adds padding for consistent spacing */
+    height: 3rem;
+    font-size: 1rem;
+    border-radius: 12.5%;
+    border: 1px solid black;
+    background-color: #ff9854e5;
+    color: black;
+    width: auto; /* Allows the button to adjust width based on content */
+    max-width: fit-content;
+    white-space: nowrap; /* Prevents wrapping to a new line */
+}
+
+
+.dropdown-filter{
+    --bs-btn-hover-bg:#ff6600 !important;
+    --bs-btn-active-bg:#ff6600 !important;
+}
+
+.dropdown-item{
+    cursor:pointer;
+}
+
+.filtering-button-pressed{
+    background-color:#ff6600 !important;
+    color: black;
+}
+
 .posts-container{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-container{
     display:flex;
     flex-direction: column;
     align-items: center;
@@ -57,6 +124,114 @@ body{
     height:60vh;
     align-items: center;
     justify-content: center;
+}
+
+.profile-actions-container{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-action-button{
+    width: 6rem;
+    height: 3rem;
+    margin:5px;
+    font-size: .95rem;
+    border-radius:12.5%;
+    border:1px solid black;
+    background-color: #ff9854e5;
+    color:black;
+}
+
+.bio-form{
+    max-height:350px;
+    padding:5px;
+}
+
+.admin-bio-actions-container{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bio-action-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #ff9854e5;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bio-action-button:hover {
+    background-color: #ff9854;
+}
+
+/* Container styling */
+.change-account-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    gap: 10px; /* Added for consistent spacing */
+}
+
+/* Action buttons container styling */
+.account-data-action-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Spacing between buttons */
+}
+
+/* Input and floating label container styling */
+.input-container {
+    position: relative;
+    width: 33%;
+    margin-bottom: 10px;
+}
+
+/* Input styling */
+.new-account-data-form {
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+    border: 1px solid black;
+    border-radius: 4px;
+    
+    outline: none;
+}
+
+/* Floating label styling */
+.input-container label {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.5rem;
+    color: #666;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: 0.2s ease;
+    background-color: white;
+    padding: 0 0.25rem;
+}
+
+/* Floating label effect when input is focused or has text */
+.new-account-data-form:focus + label,
+.new-account-data-form:not(:placeholder-shown) + label {
+    top: -0.5rem;
+    left: 0.5rem;
+    font-size: 0.8rem;
+    
+}
+
+.new-password-form{}
+
+.card-body{
 }
 
 .log-in-button-container{
@@ -103,7 +278,7 @@ body{
 }
 
 .submit-post-button{
-    background-color: rgb(255, 102, 0) !important;
+    background-color: #ff6600 !important;
     border: 2px solid black;
     margin-top: 10px;
     color: black;
@@ -121,9 +296,42 @@ body{
 
 .card{
     width: 33% !important;
-    min-width:400px !important;
+    min-width:600px !important;
     border: 2px solid black;
     margin-bottom: 20px;
+}
+
+.seen-post{
+    border: 2px solid black !important;
+}
+
+.unseen-post{
+    border: 3px solid #c25811 !important;
+}
+
+.author{
+    display:inline;
+}
+
+.author-clickable {
+    display:inline;
+    transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+.author-clickable:hover {
+    color: #ff6600; /* Change text color to orange on hover */
+    cursor: pointer;
+}
+
+.comment-card{
+    min-width:400px !important;
+    margin-bottom:10px !important;
+}
+
+.comment-filter{
+    font-size:0.75rem;
+    margin-bottom:5px;
+    height:fit-content;
 }
 
 
@@ -165,9 +373,99 @@ body{
     background-color:black;
 }
 
+.post-interaction-container{
+    width: 25%;
+    height:60px;
+    padding:2px;
+    min-width:150px;
+    height:100%;
+    background-color: rgba(255, 152, 84, 0.897);
+    border:1px solid rgba(36, 35, 35, 0.829);
+    border-radius:10%;
+}
+
+.post-interaction-button{
+    font-size:1.8rem;
+    font-style:bold;
+    border-radius: 15%;
+    width:50%;
+    height:50%;
+}
+
+.post-like-button-pressed{
+    background-color: white !important;
+    font-size:2rem;
+    color: #ff6600 !important;
+    height:auto;
+}
+
+.post-dislike-button-pressed{
+    font-size:2rem;
+    color: white !important;
+    height:auto;
+}
+
+.post-interaction-count{
+    margin-left: 10px;
+    margin-right:10px;
+}
+
+.post-interaction-info{
+    font-size:.75rem !important;
+}
+
+.post-comment-button-container{
+    width:25%;
+}
+
+.comment-section-label-container{
+    background-color: #ff985499;
+    border:2px solid rgba(36, 35, 35, 0.829);
+    border-radius:2.5%;
+}
+
+.comment-section-label{
+    background-color: #ff9854bd;
+    font-size:1.5rem;
+    font-style:bold;
+    color: black;
+    margin-top:5px;
+    border:1px solid rgba(36, 35, 35, 0.829);
+    border-radius:10%;
+    padding:10px;
+}
+
+.comment-button{
+    width:75%;
+    height:60.67px;
+    padding:2px;
+    border-radius:10%;
+    background-color: #ff9854e5;
+    border:1px solid rgba(36, 35, 35, 0.829);
+}
+
+.comments-container{
+    max-height: 1000px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.comment-section{
+    height:100%;
+    width: 75%;
+}
+
+.write-new-comment-button{
+    background-color: #ff9854bd;
+    color: black;
+    border: 2px solid black;
+    border-radius: 10%;
+}
+
 .invisible{
     display:none;
 }
+
 
 .write-post-form{
     width: 30%;

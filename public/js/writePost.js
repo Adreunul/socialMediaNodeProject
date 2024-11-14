@@ -21,6 +21,7 @@ form.addEventListener('submit', async (event) => {
         }
         else {
             console.error('Failed to fetch session');
+            return;
         }
     } catch(error) {
         console.error('Failed to fetch session', error);
@@ -28,7 +29,6 @@ form.addEventListener('submit', async (event) => {
 
     try{
         const id_author = currentUserId;
-        console.log("ID: " + id_author);
         const response = await fetch('/api/v1/posts/writePost', {
             method: 'POST',
             headers: {

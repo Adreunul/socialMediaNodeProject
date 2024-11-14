@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-  console.log("wtfbroRF");
   if (idCurrentUser == 0) {
     $(".user-action").addClass("disabled");
     $(".user-action").removeClass("active");
@@ -26,7 +25,6 @@ $(document).ready(function () {
 
   $("#loginForm").on("submit", function (event) {
     event.preventDefault(); // Prevent form submission
-    console.log("plm");
     // Validate form fields
     let isValid = validateLoginForm();
 
@@ -39,7 +37,6 @@ $(document).ready(function () {
   function validateLoginForm() {
     let email = $(".email-input").val();
     let password = $(".password-input").val();
-    console.log("uite:" + email);
 
     // Check if email is empty or invalid format
     if (email === "") {

@@ -2,8 +2,30 @@ import Post from '../models/postModel.js';
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.getAllPosts();
+        var posts = await Post.getAllPosts();
         console.log(posts);
+        posts = await formatReactionsNumber(posts);
+        res.json(posts);
+    } catch (error) {
+        console.error("Error getting posts", error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+export const getPostsByFilter = async (req, res) => {
+    try {
+        const orderFilter = req.params.order_filter;
+        const postFilter = req.params.post_filter;
+        const currentUserId = req.params.current_user_id;
+
+        var order_filter = "";
+        if(orderFilter === "mostRecent") 
+            order_filter = "post_id";
+          else
+            order_filter = "reactions_number";
+
+        var posts = await Post.getPostsByFilter(order_filter, postFilter, currentUserId);
+        posts = await formatReactionsNumber(posts);
         res.json(posts);
     } catch (error) {
         console.error("Error getting posts", error);
@@ -16,11 +38,12 @@ export const getPostById = async (req, res) => {
     console.log("id: "+id);
 
     try {
-        const post = await Post.getPostById(id);
+        var post = await Post.getPostById(id);
+        post = await formatReactionsNumber(post);
         res.status(200).json(post);
     }   catch (error) {
         console.error("Error getting post", error);
-        res.status(500).send('Internal server error');
+        res.status(500).json({ status: 'error', message: 'Failed to get post' });
     }
 };
 
@@ -49,8 +72,10 @@ export const writeNewPost = async (req, res) => {
 
         const response = await Post.createPost(title, text, currentTime, id_author);
         console.log("response: "+response);
-        if(response && typeof response === 'number')
+        if(response && typeof response === 'number') {
+            console.log("Post created by user: " + id_author);
             return res.status(201).json({ status: 'success', message: 'Post created' });
+        }
         else if(response === 'title')
             return res.status(400).json({ status: 'error', message: 'This title has already been used', field: 'title' });
         else
@@ -73,8 +98,10 @@ export const editPost = async (req, res) => {
 
     try {
         const response = await Post.updatePost(id, text);
-        if(response)
+        if(response) {
+            console.log("Post updated : " + id);
             return res.status(200).json({ status: 'success', message: 'Post updated' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to update post' });
     } catch (error) {
@@ -85,12 +112,13 @@ export const editPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
     const id = req.params.id;
-    console.log("id: "+id);
 
     try {
         const response = await Post.deletePost(id);
-        if(response)
+        if(response) {
+            console.log("Post deleted: " + id);
             return res.status(200).json({ status: 'success', message: 'Post deleted' });
+        }
         else
             return res.status(500).json({ status: 'error', message: 'Failed to delete post' });
     } catch (error) {
@@ -99,20 +127,96 @@ export const deletePost = async (req, res) => {
     }
 };
 
- function checkPost(title, content){
-    var space = false;
-    for(let i = 0; i < title.length; i++) {
-        if(title[i] == " " && space == false) {
-            space = true;
-            continue;
-        } else if(title[i] == " " && space == true) {
-            title[i] = "";
-            continue;
-        }
-        space = false;
+export const getUserHasLiked = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+
+    try {
+        const userInteraction = await Post.getUserHasLiked(id_post, id_user);
+        res.status(200).json({ status: 'success', userInteraction : userInteraction });
+    } catch (error) {
+        console.error("Error getting user interaction", error);
+        res.status(500).json({ status: 'error', message: 'Failed to get user interaction' });
     }
-    
-    if(title.split(" ").length > 10 || title.length > 50)
+};
+
+export const setUserReaction = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+    const likes = req.params.likes;
+
+    try{
+        const response = await Post.setUserReaction(id_post, id_user, likes);
+        if(response) {
+            console.log("User reaction added by user: " + id_user + " at post: " + id_post);
+            return res.status(200).json({ status: 'success', message: 'User reaction added' });
+        }
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to add user reaction' });
+    } catch (error) {
+        console.error("Error setting user reaction", error);
+        res.status(500).json({ status: 'error', message: 'Failed to add user reaction' });
+    }
+}
+
+export const editUserReaction = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+    const likes = req.params.likes;
+
+
+    try {
+        const response = await Post.editUserReaction(id_post, id_user, likes);
+        if(response) {
+            console.log("User reaction updated by user: " + id_user + " at post: " + id_post);
+            return res.status(200).json({ status: 'success', message: 'User reaction updated' });
+        }
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to update user reaction' });
+    } catch (error) {
+        console.error("Error updating user reaction", error);
+        res.status(500).json({ status: 'error', message: 'Failed to update user reaction' });
+    }
+};
+
+export const deleteUserReaction = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+
+    try {
+        const response = await Post.deleteUserReaction(id_post, id_user);
+        if(response) {
+            console.log("User reaction deleted by user: " + id_user + " at post: " + id_post);
+            return res.status(200).json({ status: 'success', message: 'User reaction deleted' });
+        }
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to delete user reaction' });
+    } catch (error) {
+        console.error("Error deleting user reaction", error);
+        res.status(500).json({ status: 'error', message: 'Failed to delete user reaction' });
+    }
+};
+
+export const markPostAsSeenByUser = async (req, res) => {
+    const id_post = req.params.id_post;
+    const id_user = req.params.id_user;
+
+    try{
+        const response = await Post.markPostAsSeenByUser(id_post, id_user);
+        if(response){
+            console.log("Post " + id_post + " marked as seen by user: " + id_user);
+            return res.status(200).json({ status: 'success', message: 'Post marked as seen' });
+        }
+        else
+            return res.status(500).json({ status: 'error', message: 'Failed to mark post as seen' });
+    } catch (error) {
+        console.error("Error marking post as seen", error);
+        res.status(500).json({ status: 'error', message: 'Failed to mark post as seen' });
+    }
+};
+
+function checkPost(title, content){  
+    if(title.split(" ").length > 10 || title.length > 100)
         return "title";
     if(content.split(" ").length > 100 || content.length > 1200)
         return "text";
@@ -120,12 +224,51 @@ export const deletePost = async (req, res) => {
     return null;
 }
 
+async function formatReactionsNumber(posts) {
+    for(var i = 0; i < posts.length; i++) {
+        if(posts[i].reactions_number == 0) {
+            posts[i].reactions_number = "1";
+            continue;
+        }
+        else if(posts[i].reactions_number < 5) {
+            posts[i].reactions_number = "< 5";
+            continue;
+        }
+        else if(posts[i].reactions_number < 10) {
+            posts[i].reactions_number = "< 10";
+            continue;
+        }
+        else if(posts[i].reactions_number > 10){
+            posts[i].reactions_number = "> 10";
+            continue;
+        }
+        else if(posts[i].reactions_number > 100){
+            posts[i].reactions_number = "> 100";
+            continue
+        }
+        else if(posts[i].reactions_number > 1000){
+            posts[i].reactions_number = "> 1000";
+            continue
+        }
+        else if(posts[i].reactions_number > 10000){
+            posts[i].reactions_number = "> 10.000";
+            continue
+        }
+    }
+
+    return posts;
+}
 
 export default {
     getAllPosts,
+    getPostsByFilter,
     getPostById,
     writeNewPost,
     editPost,
     deletePost,
-    
+    getUserHasLiked,
+    setUserReaction,
+    editUserReaction,
+    deleteUserReaction,
+    markPostAsSeenByUser
 }
