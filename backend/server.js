@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
@@ -12,7 +15,7 @@ import { requireAuth } from './middleware/authMiddleware.js';
 
 const __dirname = path.resolve();
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
