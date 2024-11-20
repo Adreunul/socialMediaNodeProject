@@ -15,12 +15,15 @@
 }
 
 * {
-    font-family: cursive;
-    font-size: 1.05rem;
+    /* font-family: cursive;
+    font-size: 1.05rem; */
+
 }
 
 body{
     background-color: rgb(255, 238, 169);
+
+    font-family: 'Sour Gummy', sans-serif;
 }
 
 .card-text{
@@ -124,6 +127,17 @@ body{
     height:60vh;
     align-items: center;
     justify-content: center;
+}
+
+.sing-in-label-container{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.sign-in-label{
+    text-align: center;
 }
 
 .profile-actions-container{
