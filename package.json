@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "backend/server.js",
+  "main": "backend/server.js",
   "type": "module",
   "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,6 +26,10 @@
     "helmet": "^8.0.0",
     "helmet-csp": "^4.0.0",
     "path": "^0.12.7",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
     "pg": "^8.13.0"
   },
   "devDependencies": {
