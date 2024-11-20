@@ -12,6 +12,7 @@ import postsRoutes from './routes/postsRoutes.js';
 import commentsRoutes from './routes/commentRoutes.js';
 import usersRoutes from './routes/userRoutes.js';
 import { requireAuth } from './middleware/authMiddleware.js';
+import helmet from 'helmet';
 
 const __dirname = path.resolve();
 const app = express();
@@ -29,6 +30,7 @@ const rateLimiter = rateLimit({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(express.json());
+app.use(helmet());
 
 app.use((req, res, next) => { // ca sa nu mai tina minte paginile care necesitau logare
     res.set('Cache-Control', 'no-store');
