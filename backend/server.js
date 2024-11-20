@@ -13,7 +13,6 @@ import commentsRoutes from './routes/commentRoutes.js';
 import usersRoutes from './routes/userRoutes.js';
 import { requireAuth } from './middleware/authMiddleware.js';
 import helmet from 'helmet';
-//import helmet from 'helmet';
 
 const __dirname = path.resolve();
 const app = express();
@@ -27,21 +26,12 @@ const rateLimiter = rateLimit({
         message: "Too many requests, please try again later."
     }
 });
-
-app.use((req, res, next) => {
-    res.setHeader(
-      "Content-Security-Policy",
-      "script-src 'self' https://cdn.jsdelivr.net; script-src-elem 'self' https://cdn.jsdelivr.net"
-    );
-    next();
-  });
   
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(express.json());
 
-//app.use(helmet());
 app.use(
     helmet({
       contentSecurityPolicy: {
