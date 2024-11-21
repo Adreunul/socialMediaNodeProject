@@ -1,6 +1,6 @@
 @media (max-width: 1600px) {
     body {
-        
+        background-color:lightblue;
     }
     .card{
         min-width:1px !important; 
