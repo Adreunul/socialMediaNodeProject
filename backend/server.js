@@ -28,8 +28,7 @@ const rateLimiter = rateLimit({
     }
 });
 
-
-  
+app.set('trust proxy', true);  
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
