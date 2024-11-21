@@ -22,13 +22,19 @@ const port = process.env.PORT || 3000;
 const rateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
+    standardHeaders: true,
+    legacyHeaders: false, 
+    keyGenerator: (req) => {
+        const xForwardedFor = req.headers['x-forwarded-for'];
+        return xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.ip;
+      },
     message: {
         status: 429,
         message: "Too many requests, please try again later."
     }
 });
 
-app.set('trust proxy', true);  
+app.set('trust proxy', 1);  
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
