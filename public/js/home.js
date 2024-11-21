@@ -155,8 +155,8 @@ async function displayPosts(posts) {
     const post = posts[i];
     const postCard = document.createElement("div");
     postCard.className = "card";
-    postCard.style.width = "35rem";
-    postCard.style.minWidth = "300px";
+    //postCard.style.width = "35rem";
+    //postCard.style.minWidth = "300px";
 
     postCard.dataset.postId = post.post_id;
 

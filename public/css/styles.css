@@ -2,9 +2,7 @@
     body {
         
     }
-    .card{
-        min-width:200px !important; 
-    }
+    
 }
 
 
@@ -319,7 +317,7 @@ body{
 
 .card{
     width: 33% !important;
-    min-width:600px !important; 
+    min-width:420px;
     border: 2px solid black;
     margin-bottom: 20px;
 }
