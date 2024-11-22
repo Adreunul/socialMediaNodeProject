@@ -1,9 +1,9 @@
 @media (max-width: 1600px) {
     body {
-        background-color:lightblue;
+        background-color:lightblue !important;
     }
     .card{
-        width: 80%;
+        width: 80% !important;
     }
 }
 
