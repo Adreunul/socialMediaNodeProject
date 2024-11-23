@@ -1,6 +1,9 @@
 @media (max-width: 1000px) {
     body {
-        background-color:lightblue;
+        
+    }
+    .card{
+        width: 85% !important;
     }
 
     .post-interaction-container{
