@@ -295,7 +295,7 @@ async function displayComments(comments) {
         console.log("comment id: " + comments[i].comment_id + "comment likes: " + comments[i].likes);
         const comment = comments[i];
         const commentCard = document.createElement("div");
-        commentCard.className = "card comment-card";
+        commentCard.className = "card comment-card-for-phone";
         commentCard.style.width = "100%";
         commentCard.style.minWidth = "50px";
         commentCard.style.marginTop = "10px";
