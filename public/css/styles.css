@@ -1,10 +1,16 @@
 
+@media (max-width: 1000px) {
     body {
         
     }
     .card{
-        min-width: 100px;
-        width: 85% !important;
+        min-width: 100px !important;
+        width: 90% !important;
+    }
+
+    #card-for-phone{
+        min-width: 100px !important;
+        width:100% !important;
     }
 
     .comment-card{
@@ -384,7 +390,15 @@ body{
 
 .card{
     width: 33%;
-    min-width:600px;
+    min-width: 600px;
+    max-width:700px;
+    border: 2px solid black;
+    margin-bottom: 20px;
+}
+
+.card-for-phone{
+    width: 33%;
+    min-width: 600px;
     max-width:700px;
     border: 2px solid black;
     margin-bottom: 20px;

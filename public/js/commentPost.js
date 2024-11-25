@@ -60,6 +60,7 @@ async function displayPost(post) {
     const postsContainer = document.getElementById('posts-container');
     postsContainer.innerHTML = "";
     const postCard = document.createElement("div");
+    postCard.id = "card";
     postCard.className = "card";
     postCard.style.width = "35rem";
     postCard.style.minWidth = "300px";
