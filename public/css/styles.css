@@ -3,16 +3,23 @@
         
     }
     .card{
+        min-width: 100px;
         width: 85% !important;
+    }
+
+    .comment-card{
+        
     }
 
     .post-interaction-container{
         width: 36% !important;
+        min-width: 135px !important;
+        max-width: 145px !important;
         padding:2px !important;
     }
     
     .post-interaction-button{
-        font-size:1rem;
+        font-size:1.8rem;
         font-style:bold;
         border-radius: 15%;
         width:50% !important;
@@ -33,10 +40,13 @@
 
     .post-date-and-author-container{
         width:27% !important;
+
     }
 
     .post-comment-button-container{
         width:36% !important;
+        min-width: 90px !important;
+        max-width: 100px !important;
     }
 
     .comment-button{
@@ -374,7 +384,8 @@ body{
 
 .card{
     width: 33%;
-    min-width:100px;
+    min-width:600px;
+    max-width:700px;
     border: 2px solid black;
     margin-bottom: 20px;
 }
