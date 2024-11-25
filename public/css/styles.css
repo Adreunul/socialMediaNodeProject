@@ -7,10 +7,10 @@
         min-width: 100px !important;
         width: 90% !important;
     }
-
+    
 
     .comment-card{
-        
+        max-width: 250px !important;
     }
 
     .post-interaction-container{
