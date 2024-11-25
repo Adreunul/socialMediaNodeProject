@@ -521,6 +521,11 @@ body{
     width:50%;
 }
 
+.comment-author-container{
+    display:flex;
+    justify-content:center;
+}
+
 .post-comment-button-container{
     width:25%;
 }

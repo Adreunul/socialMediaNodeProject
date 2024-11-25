@@ -60,7 +60,6 @@ async function displayPost(post) {
     const postsContainer = document.getElementById('posts-container');
     postsContainer.innerHTML = "";
     const postCard = document.createElement("div");
-    postCard.id = "card";
     postCard.className = "card";
     postCard.style.width = "35rem";
     postCard.style.minWidth = "300px";
@@ -309,21 +308,23 @@ async function displayComments(comments) {
             ${comment.text}
         </p>
         <hr class="content-underline" style="margin-bottom:5px !important;">
-        <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-            <div class="author" style="text-align: center;">
-                ${comment.username} ${comment.username == authorName ? "[author]" : ((comment.agrees == null ? "" : (comment.agrees == 1 ? "agrees" : "disagrees"))) }
+        <div class="comment-author-container">
+            <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <div class="author" style="text-align: center;">
+                    ${comment.username} ${comment.username == authorName ? "[author]" : ((comment.agrees == null ? "" : (comment.agrees == 1 ? "agrees" : "disagrees"))) }
+                </div>
+
+                <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
+                    &#x21e7
+                    <p class="like-counter" style="position: absolute; top: 2px; right: 2px; font-size: 12px; color: black; margin: 0;">
+                        ${comment.likes}
+                    </p>
+                </button>
+
+                <button class="author-delete-button ${currentUserId === comment.user_id ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 2.5px !important; margin-top: 2.5px !important;background-color:#ffffff00;border:0.5px solid black;border-radius:7.5%;">
+                    Delete
+                </button>
             </div>
-
-            <button class="post-interaction-button like-button ${userHasLiked ? "post-like-button-pressed" : ""}" style="position: relative; background-color: #e2dcd9a8; color: black; width: 55px; height: 55px; text-align: center; margin-bottom: 2px; border: 1px solid black;">
-                &#x21e7
-                <p class="like-counter" style="position: absolute; top: 2px; right: 2px; font-size: 12px; color: black; margin: 0;">
-                    ${comment.likes}
-                </p>
-            </button>
-
-            <button class="author-delete-button ${currentUserId === comment.user_id ? "" : "invisible"}" style="font-size: 0.8rem; margin-bottom: 2.5px !important; margin-top: 2.5px !important;background-color:#ffffff00;border:0.5px solid black;border-radius:7.5%;">
-                Delete
-            </button>
         </div>
     </div>
 `;
