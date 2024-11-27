@@ -226,11 +226,11 @@ function checkPost(title, content){
 
 async function formatReactionsNumber(posts) {
     for(var i = 0; i < posts.length; i++) {
-        if(posts[i].reactions_number == 0) {
-            posts[i].reactions_number = "1";
-            continue;
-        }
-        else if(posts[i].reactions_number < 5) {
+        // if(posts[i].reactions_number == 0) {
+        //     posts[i].reactions_number = "No ";
+        //     continue;
+        // }
+        if(posts[i].reactions_number < 5) {
             posts[i].reactions_number = "< 5";
             continue;
         }

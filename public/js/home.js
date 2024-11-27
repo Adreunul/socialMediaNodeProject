@@ -129,14 +129,14 @@ async function displayPosts(posts) {
       }
     });
 
-    // Check if user has scrolled to the last 5% of the page
+
     const scrollPosition = window.scrollY + window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     if (scrollPosition / documentHeight > 0.95) {
-      // If the user has scrolled near the bottom, trigger visibility check for remaining posts
+
       const remainingPosts = document.querySelectorAll(".unseen-post");
       remainingPosts.forEach(postCard => {
-        // Check if post is visible and mark it as seen
+
         if (!checkIfPostLeftViewport(postCard)) {
           const postId = postCard.dataset.postId;
           postCard.classList.add("seen-post");
@@ -147,7 +147,6 @@ async function displayPosts(posts) {
     }
   }
 
-  // Add scroll listener
   if(userId == currentUserId)
     window.addEventListener("scroll", handleScroll);
 
@@ -155,8 +154,8 @@ async function displayPosts(posts) {
     const post = posts[i];
     const postCard = document.createElement("div");
     postCard.className = "card";
-    postCard.style.width = "35rem";
-    postCard.style.minWidth = "300px";
+    //postCard.style.width = "35rem";
+    //postCard.style.minWidth = "300px";
 
     postCard.dataset.postId = post.post_id;
 
@@ -210,11 +209,11 @@ async function displayPosts(posts) {
 
                     <div class="post-interaction-count-container" style="display: flex; flex-direction: column; align-items: center;">
                         <p class="post-interaction-info post-interaction-count" style="margin-bottom: 0px !important;">
-                            ${post.reactions_number} ${post.reactions_number == 1 ? "reaction" : "reactions"}
+                          ${post.reactions_number} reactions
                         </p>
 
                         <p class="post-interaction-info post-interaction-percentage" style="margin-bottom: 0px !important;">
-                            ${post.agree_percentage}% agree
+                          ${post.agree_percentage}% agree 
                         </p>
                     </div>
                 </div>
@@ -222,7 +221,7 @@ async function displayPosts(posts) {
                 <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center;width:50%;">
 
                 <div class="post-date" style="display: flex; flex-direction: column; align-items: center;margin-bottom:10px;">
-                    <div class="post-date-area" style="width: fit-content; height: fit-content; display: flex; flex-direction: column; align-items: center; background-color: rgba(0, 0, 0, 0.075); padding: 5px; border: 0.75px solid darkgray; border-radius: 25%;min-width:80px;">
+                    <div class="post-date-area" style="width: fit-content; height: fit-content; display: flex; flex-direction: column; align-items: center; background-color: #ff66008e; padding: 5px; border: 0.75px solid darkgray; border-radius: 15%;min-width:80px;">
                         <p style="font-size: 0.8rem; margin-bottom: 0px !important;">
                             ${formatPostDate(post)}
                         </p>
@@ -251,7 +250,7 @@ async function displayPosts(posts) {
 
                 <div class="post-comment-button-container" style="display:flex;flex-direction:row-reverse;">
                   <button class="comment-button" style="color: black;">
-                      <img src="/img/commentButton.png" alt="comment button" style="width: 50px; height: 50px;">
+                      <img class="comment-button-image" src="/img/commentButton.png" alt="comment button">
                   </button>
                 </div>
             </div>
@@ -274,7 +273,7 @@ async function displayPosts(posts) {
         });
 
         likeButton.addEventListener("click", async (event) => {
-            if(!postCard.classList.contains("seen-post")) { //mark post seen, seems more logical
+            if(!postCard.classList.contains("seen-post")) {
             postCard.classList.add("seen-post");
             postCard.classList.remove("unseen-post");
             markPostAsSeenByUser(post.post_id);
@@ -412,16 +411,16 @@ async function handleDeletePost(post, postCard, userHasLiked, userHasDisliked) {
 
                     <div class="post-interaction-count-container" style="display: flex; flex-direction: column; align-items: center;">
                         <p class="post-interaction-info post-interaction-count" style="margin-bottom: 0px !important;">
-                            ${post.reactions_number} ${post.reactions_number == 1 ? "reaction" : "reactions"}
+                          ${post.reactions_number} reactions
                         </p>
 
                         <p class="post-interaction-info post-interaction-percentage" style="margin-bottom: 0px !important;">
-                            ${post.agree_percentage}% agree
+                          ${post.agree_percentage}% agree 
                         </p>
                     </div>
                 </div>
 
-                <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center;width:50%;">
+                <div class="post-date-and-author-container" style="display: flex; flex-direction: column; align-items: center;">
 
                 <div class="post-date" style="display: flex; flex-direction: column; align-items: center;margin-bottom:10px;">
                     <div class="post-date-area" style="width: fit-content; height: fit-content; display: flex; flex-direction: column; align-items: center; background-color: rgba(0, 0, 0, 0.075); padding: 5px; border: 0.75px solid darkgray; border-radius: 25%;min-width:80px;">
