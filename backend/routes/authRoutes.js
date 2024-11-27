@@ -16,7 +16,6 @@ const rateLimiter = rateLimit({
 
 
 router.post('/login', rateLimiter, controller.login);
-router.post('/register', rateLimiter, controller.register);
 router.patch('/updatePassword', rateLimiter, requireAuth, controller.updatePassword);
 router.post('/logout', rateLimiter, requireAuth, controller.logout);
 router.get('/session', rateLimiter, requireAuth, controller.getMyCurrentSession);

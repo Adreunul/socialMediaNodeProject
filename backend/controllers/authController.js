@@ -41,46 +41,6 @@ export const logout = (req, res) => {
 };
 
 
-export const register = async (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
-
-    if (!username || !email || !password || !confirmPassword) {
-        return res.status(400).json({ status: 'error', message: 'All fields are required', field: 'all' });
-    }
-
-    if (!checkUsername(username) || username.length > 15) {
-        return res.status(400).json({ status: 'error', message: 'Username can only contain letters and numbers and must have a maximum of 15 characters.', field: 'username' });
-    }
-
-    if (!checkPasswordSyntax(password)) {
-        return res.status(400).json({ status: 'error', message: 'Password must be at least 8 characters long and contain at least one upper case character, one number and one special character', field: 'password' });
-    }
-
-    if (password !== confirmPassword) {
-        return res.status(400).json({ status: 'error', message: 'Passwords do not match', field: 'passwords' });
-    }
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const response = await User.register(username, email, hashedPassword);
-
-        if (response && typeof response === 'number') {
-            req.session.userId = response;
-            console.log('User registered:', response);
-            return res.status(201).json({ status: 'success', message: 'User created', userId: response });
-        } else if (response === 'email') {
-            return res.status(400).json({ status: 'error', message: 'Email already in use', field: 'email' });
-        } else if (response === 'username') {
-            return res.status(400).json({ status: 'error', message: 'Username already in use', field: 'username' });
-        } else {
-            return res.status(500).json({ status: 'error', message: 'Failed to create user', });
-        }
-    } catch (error) {
-        console.error('Error in registration process:', error);
-        return res.status(500).json({ status: 'error', message: 'Server error' });
-    }
-};
-
 export const updatePassword = async (req, res) => {
     const { actual_password, new_password, user_id } = req.body;
 
@@ -135,7 +95,6 @@ function checkUsername(username) {
 
 export default {
     login, 
-    register,
     updatePassword,
     logout,
     getMyCurrentSession,
