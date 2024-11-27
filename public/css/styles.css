@@ -10,7 +10,7 @@
 
 
     .comment-card{
-        
+        max-width: 250px !important;
     }
 
     .post-interaction-container{
@@ -410,6 +410,7 @@ body{
 
 .author{
     display:inline;
+    min-width:200px;
 }
 
 .author-clickable {
