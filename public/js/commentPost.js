@@ -277,7 +277,7 @@ async function displayComments(comments) {
     commentsContainer.innerHTML = ``;
     
     const writeNewCommentCard = document.createElement("div");   // new comm card
-        writeNewCommentCard.className = "card comment-card";
+        writeNewCommentCard.className = "card comment-card-for-phone";
         writeNewCommentCard.style.width = "50%!important";
         writeNewCommentCard.style.minWidth = "50px";
         writeNewCommentCard.style.marginTop = "10px";
@@ -292,7 +292,6 @@ async function displayComments(comments) {
 
     if(comments != null){ //if there are comms
         for(let i = 0; i < comments.length; i++) { //we show them all
-        console.log("comment id: " + comments[i].comment_id + "comment likes: " + comments[i].likes);
         const comment = comments[i];
         const commentCard = document.createElement("div");
         commentCard.className = "card comment-card-for-phone";
@@ -362,7 +361,7 @@ async function displayComments(comments) {
     }
     else{ //if there are no comms
         const commentCard = document.createElement("div"); //we show a message
-        commentCard.className = "card comment-card";
+        commentCard.className = "card comment-card-for-phone";
         commentCard.style.width = "100%";
         commentCard.style.minWidth = "50px";
         commentCard.style.marginTop = "10px";
